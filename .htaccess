@@ -1,4 +1,3 @@
-
 # Since the router bases on a php script, we redirect all requests to index.php, which then loads the corresponding site:
 RewriteEngine On
 RewriteBase /

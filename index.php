@@ -1,6 +1,6 @@
 <?php
 
-include("src/main.php");
-var_dump(route_all());
+include("src/php-router/main.php");
+route_all();
 
 ?>

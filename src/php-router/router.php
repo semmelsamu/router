@@ -13,7 +13,7 @@ function route_all()
     $request = array_slice($url, sizeof($base_paths));
 
     global $routes;
-    return route($request, $routes);
+    include(getcwd().HTDOCS_PATH."/".route($request, $routes));
 }
 
 function route($request, $routes)

@@ -4,15 +4,19 @@
 $routes = [
     [
         "url" => "*",
-        "path" => "index.html",
+        "path" => "index.php",
+    ],
+    [
+        "url" => "start",
+        "path" => "index.php",
     ],
     [
         "url" => "site",
-        "path" => "site.html",
+        "path" => "site.php",
         "suburls" => [
             [
                 "url" => "sub",
-                "path" => "sub.html",
+                "path" => "sub.php",
             ],
         ]
     ],

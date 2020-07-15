@@ -20,17 +20,10 @@ $request = array_slice($url, sizeof($base_paths));
 
 $routes = [
     [
-        "url" => ROUTES_INDEX,
-        "path" => "index.html",
-    ],
-    [
         "url" => "site",
         "path" => "site.html",
     ],
 ];
-
-var_dump($request); echo "<br><br><br>";
-var_dump($routes); echo "<br><br><br>";
 
 function route($request, $routes)
 {
@@ -63,8 +56,7 @@ function route($request, $routes)
     else
     {
         # Return the index page (if existing):
-
-        if(in_array(ROUTES_INDEX, $current_urls));
+        if(in_array(ROUTES_INDEX, $current_urls))
         {
             return($routes[array_search(ROUTES_INDEX, $current_urls)]["path"]);
         }

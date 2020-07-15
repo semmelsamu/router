@@ -9,6 +9,12 @@ $routes = [
     [
         "url" => "site",
         "path" => "site.html",
+        "suburls" => [
+            [
+                "url" => "sub",
+                "path" => "sub.html",
+            ],
+        ]
     ],
 ];
 

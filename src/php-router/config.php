@@ -9,6 +9,9 @@ define("BASE_PATH", $settings["paths"]["base"]);
 # Path to where all html documents should be.
 define("HTDOCS_PATH", $settings["paths"]["htdocs"]);
 
+# Path to where all html documents should be.
+define("PATH_TO_404", $settings["files"]["404"]);
+
 # Default strings for the routes array and functions:
 define("ROUTES_INDEX_URL", "*");
 define("ROUTES_URL", "url");

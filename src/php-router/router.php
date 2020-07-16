@@ -13,7 +13,17 @@ function route_all()
     $request = array_slice($url, sizeof($base_paths));
 
     global $routes;
-    include(getcwd().HTDOCS_PATH."/".route($request, $routes));
+
+    $route_path = route($request, $routes);
+    if($route_path)
+    {
+        include(getcwd().HTDOCS_PATH."/".$route_path);
+        return 0;
+    }
+    else
+    {
+        include(getcwd().HTDOCS_PATH."/".PATH_TO_404);
+    }
 }
 
 function route($request, $routes)

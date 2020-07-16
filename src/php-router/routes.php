@@ -5,6 +5,7 @@ $routes = [
     [
         "url" => "*",
         "path" => "index.php",
+        "args" => true,
     ],
     [
         "url" => "start",

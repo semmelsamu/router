@@ -17,5 +17,6 @@ define("ROUTES_INDEX_URL", "*");
 define("ROUTES_URL", "url");
 define("ROUTES_SUBURLS", "suburls");
 define("ROUTES_PATH", "path");
+define("ROUTES_ARGS", "args");
 
 ?>

@@ -55,7 +55,14 @@ class Php_router
         return $return_value;
     }
 
-    public function get_route($initial_request) {
+    public function get_route($initial_request = null) {
+
+        if(!isset($initial_request))
+        {
+            # If we didn't specify any specific request address, we just takt the uri:
+            $initial_request = $_SERVER["REQUEST_URI"];
+        }
+
         # We use arrays to explode the long request string into smaller bits, which are better to process:
         $initial_request = explode("/", trim($initial_request, " /"));
 
@@ -66,7 +73,7 @@ class Php_router
         return $this->route_inner($request, $this->routes);
     }
 
-    public function route($initial_request)
+    public function route($initial_request = null)
     {
         # This function just auto-includes the routed file. If we din't find any file, we just include the 404 document.
         $route = $this->get_route($initial_request);

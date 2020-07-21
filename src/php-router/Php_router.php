@@ -34,12 +34,44 @@ class Php_router
                     # Check if we have suburls we can process further
                     if(isset($current_url[ROUTES_SUBURLS]))
                     {
-                        $return_value[ROUTES_PATH] = $this->route_inner($request, $current_url[ROUTES_SUBURLS])[ROUTES_PATH];
+                        $return_value = $this->route_inner($request, $current_url[ROUTES_SUBURLS]);
+
+                        if($return_value[ROUTES_PATH] == "*")
+                        {
+                            if(isset($current_url[ROUTES_ARGS]) && $current_url[ROUTES_ARGS])
+                            {
+                                $return_value[ROUTES_PATH] = $current_url[ROUTES_PATH];
+                                $return_value[ROUTES_ARGS] = $request;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if(isset($current_url[ROUTES_ARGS]) && $current_url[ROUTES_ARGS])
+                        {
+                            $return_value[ROUTES_PATH] = $current_url[ROUTES_PATH];
+                            $return_value[ROUTES_ARGS] = $request;
+                        }
                     }
                 }
                 else
                 {
                     $return_value[ROUTES_PATH] = $current_url[ROUTES_PATH];
+                }
+            }
+            else
+            {
+                $return_value[ROUTES_PATH] = "*";
+
+                if(in_array("*", $current_urls))
+                {
+                    $index_key = array_search("*", $current_urls);
+                    if(isset($routes[$index_key][ROUTES_ARGS]) && $routes[$index_key][ROUTES_ARGS])
+                    {
+                        $return_value[ROUTES_PATH] = $routes[$index_key][ROUTES_PATH];
+                        array_unshift($request, $current_path);
+                        $return_value[ROUTES_ARGS] = $request;
+                    }
                 }
             }
         }

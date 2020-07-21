@@ -10,8 +10,14 @@ class Php_router
         $this->routes = $routes;
     }
 
-    private function route_inner($request, $routes)
+    private function get_route($request, $routes)
     {
+        /*
+        This function handles the actual routing. We go through the routes tree and search for 
+        matching urls. If suburls exist, we call ourselves recursive and repeat the process. We
+        also return the further arguments if accepted by the routes.
+        */
+
         $return_value = [
             ROUTES_PATH => null,
             ROUTES_ARGS => null,
@@ -34,7 +40,7 @@ class Php_router
                     # Check if we have suburls we can process further
                     if(isset($current_url[ROUTES_SUBURLS]))
                     {
-                        $return_value = $this->route_inner($request, $current_url[ROUTES_SUBURLS]);
+                        $return_value = $this->get_route($request, $current_url[ROUTES_SUBURLS]);
 
                         if($return_value[ROUTES_PATH] == "*")
                         {
@@ -87,29 +93,39 @@ class Php_router
         return $return_value;
     }
 
-    public function get_route($initial_request = null) {
+    public function route($request_uri = null) 
+    {
+        /*
+        This function returns a path to a file that corresponds with the request uri. If no file is found, it returns null.
+        */
 
-        if(!isset($initial_request))
+        # If we didn't specify any specific request address the function should process (the default case), we just takt the request uri:
+        if(!isset($request_uri))
         {
-            # If we didn't specify any specific request address, we just takt the uri:
-            $initial_request = $_SERVER["REQUEST_URI"];
+            $request_uri = $_SERVER["REQUEST_URI"];
         }
 
-        # We use arrays to explode the long request string into smaller bits, which are better to process:
-        $initial_request = explode("/", trim($initial_request, " /"));
+        # We use arrays to explode the long request string into smaller array values, which are better to process:
+        $request_uri = explode("/", trim($request_uri, " /"));
 
-        # To get the actual request our router should handle, we need to cut off the base path directories:
+        # To get the actual request our router should handle, we need to cut off the base directories:
         $base_directories = explode("/", trim(BASE_PATH, " /"));
-        $request = array_slice($initial_request, sizeof($base_directories));
+        $request = array_slice($request_uri, sizeof($base_directories));
 
-        return $this->route_inner($request, $this->routes);
+        return $this->get_route($request, $this->routes);
     }
 
-    public function route($initial_request = null)
+    public function route_include($request_uri = null)
     {
-        # This function just auto-includes the routed file. If we din't find any file, we just include the 404 document.
-        $route = $this->get_route($initial_request);
+        /*
+        Basicly is this the route() function, but it also includes the routed file if found. If not, it includes the 404 file.
+        Returns the arguments in the request if the route accepts arguments.
+        */
 
+        # Finding of the path already handles the route() function. We just call it here and save the output in the variable for further processing later.
+        $route = $this->route($request_uri);
+
+        # Does a matching file exist?
         if(isset($route[ROUTES_PATH]))
         {
             # File found, include it and, if existing, return arguments
@@ -118,12 +134,13 @@ class Php_router
         }
         else
         {
-            # No file found, include 404 document and return no arguments
+            # No file found, include 404 document, throw 404 response and return no arguments
             http_response_code(404);
             include(getcwd().HTDOCS_PATH."/".PATH_TO_404);
             return null;
         }
     }
+
 }
 
 

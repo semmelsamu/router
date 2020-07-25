@@ -1,7 +1,7 @@
 RewriteEngine On
 
 # IMPORTANT: If you use the router only in a specific directory, enter it here. If not, just use "RewriteBase /"
-RewriteBase /php-router
+RewriteBase /php-router/examples
 
 # Since the router bases on a php script, we redirect all requests to index.php, which then loads the corresponding site:
 RewriteCond %{REQUEST_FILENAME} !-f

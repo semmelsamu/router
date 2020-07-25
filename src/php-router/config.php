@@ -1,16 +1,14 @@
 <?php
 
-# All settings the user would change are in settings.ini. We read them here and define the constants for our PHP script:
-$settings = parse_ini_file("settings.ini", true);
-
 # If the router should be only active in a specific directory, it should be defined here:
-define("BASE_PATH", $settings["paths"]["base"]);
+define("BASE_PATH", "/");
 
 # Path to where all html documents should be.
-define("HTDOCS_PATH", $settings["paths"]["htdocs"]);
+define("HTDOCS_PATH", "/htdocs");
 
-# Path to where all html documents should be.
-define("PATH_TO_404", $settings["files"]["404"]);
+# 404 document path.
+define("PATH_TO_404", "404.html");
+
 
 # Default strings for the routes array and functions:
 define("ROUTES_INDEX_URL", "*");

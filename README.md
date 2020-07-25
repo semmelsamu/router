@@ -10,6 +10,7 @@
 1. Copy the src folder into your server directory
 2. Enter your route tree into `routes.php` (see [routes.php](#routes.php))
 3. Insert the matching files into the [htdocs folder](#HTDOCS_PATH)
+4. Create a htaccess file, which redirects every request to a php file, which then routes the request. (See examples)
 
 ## Usage
 

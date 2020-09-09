@@ -61,37 +61,50 @@
                 $to = $this->get_path_list($to);
             }
 
-            if($from == $to) {
-                return "./".end($to);
-            }
-
-            if(sizeof($from) > 0 && sizeof($to) > 0)
+            if(!empty($from) && !empty($to))
             {
-                while($from[0] == $to[0] && sizeof($from) > 0 && sizeof($to) > 0) {
+                while(!empty($from) && !empty($to) && $from[0] == $to[0]) {
                     array_shift($from);
                     array_shift($to);
                 }
             }
 
-            return str_repeat("../", sizeof($from)).implode("/", $to);
+            $path = "";
+
+            $dirs_up = sizeof($from);
+
+            if(substr($_SERVER["REQUEST_URI"], -1) != "/") {
+                $dirs_up--;
+                $path .= "./";
+            }
+
+            $path .= str_repeat("../", $dirs_up);
+            $path .= implode("/", $to);
+            
+            if(!empty($to)) {
+                $path .= "/";
+            }
+
+            return $path;
         }
 
-        function get_uri($id) {
+        function get_uri_list($id) {
             if($this->id == $id) {
-                return true;
+                return [];
             }
-            else {
-                foreach($this->routes as $path => $route) {
-                    $result = $route->get_uri($id);
-                    if($result === true) {
-                        return $path;
-                    }
-                    elseif($result) {
-                        return $path."/".$result;
+            if(!empty($this->routes)) {
+                foreach($this->routes as $url => $route) {
+                    $result = $route->get_uri_list($id);
+                    if(is_array($result)) {
+                        array_unshift($result, $url);
+                        return $result;
                     }
                 }
             }
-            return null;
+        }
+
+        function get_to($id) {
+            return $this->get_relative_path($this->get_uri_list($id));
         }
     }
 

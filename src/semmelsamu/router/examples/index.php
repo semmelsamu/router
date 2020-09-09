@@ -1,32 +1,30 @@
 <?php
 
+    function lg($content) {
+        echo "<pre>";
+        var_dump($content);
+        echo "</pre>";
+    }
+
     include("../index.php");
 
     $htdocs_folder = "htdocs/";
 
     $routes = new Route([
-        "file" => $htdocs_folder."start.php",
+        "file" => $htdocs_folder."index.php",
         "routes" => [
             "start" => new Route([
                 "file" => $htdocs_folder."start.php", 
                 "args" => true,
                 "routes" => [
                     "site" => new Route(["file" => $htdocs_folder."site.php", "id" => "site"]),
-                ]
+                ],
+                "id" => "start"
             ])
-        ]
+        ],
+        "id" => "index"
     ]);
 
-    $result = $routes->route();
-    if(isset($result)) {
-        include($result);
-    }
-    else {
-        include($htdocs_folder."404.php");
-    }
-
-    echo "<br>Args: <pre>";
-    print_r($args);
-    echo "</pre>"
+    echo $routes->get_to("start");
 
 ?>

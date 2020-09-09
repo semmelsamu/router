@@ -61,10 +61,13 @@
                 $to = $this->get_path_list($to);
             }
 
-            while($from[0] == $to[0] && sizeof($from) > 0 && sizeof($to) > 0) {
-                array_shift($from);
-                array_shift($to);
-            } 
+            if(sizeof($from) > 0 && sizeof($to) > 0)
+            {
+                while($from[0] == $to[0] && sizeof($from) > 0 && sizeof($to) > 0) {
+                    array_shift($from);
+                    array_shift($to);
+                }
+            }
 
             return str_repeat("../", sizeof($from)).implode("/", $to);
         }

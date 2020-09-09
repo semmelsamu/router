@@ -61,6 +61,10 @@
                 $to = $this->get_path_list($to);
             }
 
+            if($from == $to) {
+                return ".";
+            }
+
             if(sizeof($from) > 0 && sizeof($to) > 0)
             {
                 while($from[0] == $to[0] && sizeof($from) > 0 && sizeof($to) > 0) {

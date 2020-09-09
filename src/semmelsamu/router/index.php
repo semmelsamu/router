@@ -6,7 +6,7 @@
 
             global $args;
             $args = [];
-            
+
             $default_params = [
                 "file" => null,
                 "id" => null,
@@ -22,32 +22,17 @@
             $this->routes = $params["routes"];
         }
 
+        function get_path_list($uri) {
+            return array_map("strtolower", array_filter(explode("/", $uri)));
+        }
+
         function get_request() {
-            return array_map(
-                "strtolower",
-                array_filter(
-                    explode(
-                        "/", 
-                        trim(
-                            substr(
-                                $_SERVER['REQUEST_URI'], 
-                                strlen(
-                                    substr(
-                                        getcwd(), 
-                                        strlen($_SERVER["DOCUMENT_ROOT"])
-                                    )
-                                )
-                            ), 
-                            " /\\"
-                        )
-                    )
-                )
-            );
+            return trim(substr($_SERVER['REQUEST_URI'], strlen(substr(getcwd(), strlen($_SERVER["DOCUMENT_ROOT"])))), " /\\");
         }
 
         function route($request = null) {
             if(!isset($request)) {
-                $request = $this->get_request();
+                $request = $this->get_path_list(get_request());
             }
 
             if(sizeof($request) > 0) {
@@ -69,15 +54,32 @@
             return null;
         }
 
-        function get_file($id) {
+        function get_relative_path($to) {
+            $from = $this->get_path_list($this->get_request());
+            if(!is_array($to)) {
+                $to = $this->get_path_list($to);
+            }
+
+            while($from[0] == $to[0] && sizeof($from) > 0 && sizeof($to) > 0) {
+                array_shift($from);
+                array_shift($to);
+            } 
+
+            return str_repeat("../", sizeof($from)).implode("/", $to);
+        }
+
+        function get_uri($id) {
             if($this->id == $id) {
-                return $this->file;
+                return true;
             }
             else {
-                foreach($this->routes as $key => $route) {
-                    $result = $route->get_file($id);
-                    if($result) {
-                        return $result;
+                foreach($this->routes as $path => $route) {
+                    $result = $route->get_uri($id);
+                    if($result === true) {
+                        return $path;
+                    }
+                    elseif($result) {
+                        return $path."/".$result;
                     }
                 }
             }

@@ -9,14 +9,12 @@
                 "file" => "index.php", 
                 "args" => true,
                 "routes" => [
-                    "site" => new Route(["file" => "site.php"]),
+                    "site" => new Route(["file" => "site.php", "id" => "site"]),
                 ]
             ])
         ]
     ]);
 
-    var_dump($routes->get_file("start"));
-    echo "<br>";
-    var_dump($args);
+    var_dump($routes->get_uri("site"));
 
 ?>

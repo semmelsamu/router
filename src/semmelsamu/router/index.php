@@ -3,6 +3,10 @@
     class Route {
 
         function __construct($params = []) {
+
+            global $args;
+            $args = [];
+            
             $default_params = [
                 "file" => null,
                 "id" => null,
@@ -46,9 +50,6 @@
                 $request = $this->get_request();
             }
 
-            global $args;
-            $args = [];
-
             if(sizeof($request) > 0) {
                 if(sizeof($this->routes) > 0 && array_key_exists($request[0], $this->routes)) {
                     $current_request = array_shift($request);
@@ -65,6 +66,21 @@
                 return $this->file;
             }
 
+            return null;
+        }
+
+        function get_file($id) {
+            if($this->id == $id) {
+                return $this->file;
+            }
+            else {
+                foreach($this->routes as $key => $route) {
+                    $result = $route->get_file($id);
+                    if($result) {
+                        return $result;
+                    }
+                }
+            }
             return null;
         }
     }

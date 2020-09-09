@@ -15,7 +15,7 @@
         ]
     ]);
 
-    var_dump($routes->route());
+    var_dump($routes->get_file("start"));
     echo "<br>";
     var_dump($args);
 

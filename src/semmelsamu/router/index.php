@@ -4,9 +4,6 @@
 
         function __construct($params = []) {
 
-            global $args;
-            $args = [];
-
             $default_params = [
                 "file" => null,
                 "id" => null,
@@ -30,9 +27,13 @@
             return trim(substr($_SERVER['REQUEST_URI'], strlen(substr(getcwd(), strlen($_SERVER["DOCUMENT_ROOT"])))), " /\\");
         }
 
-        function route($request = null) {
+        function route($request = null, $auto_include = true) {
+
+            global $args;
+            $args = [];
+
             if(!isset($request)) {
-                $request = $this->get_path_list(get_request());
+                $request = $this->get_path_list($this->get_request());
             }
 
             if(sizeof($request) > 0) {

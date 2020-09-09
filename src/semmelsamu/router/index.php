@@ -62,7 +62,7 @@
             }
 
             if($from == $to) {
-                return ".";
+                return "./".end($to);
             }
 
             if(sizeof($from) > 0 && sizeof($to) > 0)

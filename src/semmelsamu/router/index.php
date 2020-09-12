@@ -78,6 +78,10 @@
                 $path .= "./";
             }
 
+            if($dirs_up < 0) {
+                $dirs_up = 0;
+            }
+
             $path .= str_repeat("../", $dirs_up);
             $path .= implode("/", $to);
             

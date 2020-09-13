@@ -52,6 +52,10 @@
                 $result = ".";
             }
 
+            if(substr($result, -1) != "/") {
+                $result .= "/";
+            }
+
             return $result;
         }
 

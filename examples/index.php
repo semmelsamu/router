@@ -1,21 +1,25 @@
 <?php
 
-    function lg($content) {
-        echo "<pre>";
-        var_dump($content);
-        echo "</pre>";
-    }
-
     include("../src/semmelsamu/router/index.php");
 
-    $htdocs_folder = "htdocs/";
-
-    $routes = new Route(["file" => $htdocs_folder."index.php", "id" => "index", "routes" => [
-        "start" => new Route(["file" => $htdocs_folder."start.php", "args" => true, "id" => "start", "routes" => [
-            "site" => new Route(["file" => $htdocs_folder."site.php", "id" => "site"]),
+    $router = new Router(new Route(["file" => "htdocs/index.php", "id" => "start", "routes" => [
+        "site" => new Route(["file" => "htdocs/site.php", "id" => "site", "routes" => [
+            "sub" => new Route(["file" => "htdocs/sub.php", "id" => "sub", "accept_args" => true]),
         ]])
-    ]]);
+    ]]), "htdocs/404.php");
 
-    echo $routes->get_to("start");
+    $route = $router->route();
+
+    echo "<br>Arguments: ";
+    var_dump($route->args);
+
+    echo "<br>Links: ";
+    echo '<a href="'.$router->route_id("start").'">Link to Start</a> ';
+    echo '<a href="'.$router->route_id("site").'">Link to Site</a> ';
+    echo '<a href="'.$router->route_id("sub").'">Link to Sub</a> ';
+
+    echo "<br>Relative path to root: ";
+    echo $router->route_rel();
+
 
 ?>

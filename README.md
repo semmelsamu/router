@@ -100,7 +100,7 @@ Returns the relative path to the route with the id `$id`.
 
 This function is intended for getting the link hrefs for your site:
 
-```php
+```html
 <a href="<?= $router->route_id('index') ?>footer.css">Home</a>
 ```
 
@@ -114,6 +114,6 @@ Returns the relative path to the directory with the absolute path `$path`.
 
 This function is intended for linking static files in your site, e.g. css, js or img files. If your css files are e.g. in `static/css`, you can use this function to dynamically get the relative path from the url to the file:
 
-```php
+```html
 <link rel="stylesheet" href="<?= $router->route_rel('static/css') ?>footer.css">
 ```

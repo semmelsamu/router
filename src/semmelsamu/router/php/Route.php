@@ -9,6 +9,7 @@
                 "id" => null,
                 "accept_args" => false,
                 "routes" => [],
+                "visible" => true,
             ];
 
             $params = array_replace($default_params, $params);
@@ -57,10 +58,12 @@
         function get_all_routes() {
             $result = array();
             foreach($this->routes as $route => $value) {
-                array_push($result, $route);
-                $sub_routes = $value->get_all_routes();
-                foreach($sub_routes as $sub_route) {
-                    array_push($result, $route."/".$sub_route);
+                if($value->visible) {
+                    array_push($result, $route);
+                    $sub_routes = $value->get_all_routes();
+                    foreach($sub_routes as $sub_route) {
+                        array_push($result, $route."/".$sub_route);
+                    }
                 }
             }
             return $result;

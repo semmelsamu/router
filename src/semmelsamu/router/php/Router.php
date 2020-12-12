@@ -14,6 +14,10 @@
             if(!isset($request)) {
                 $request = $this->get_path_list($this->get_uri());
             }
+            if(array_shift($request) == "sitemap.xml") {
+                $this->get_sitemap();
+                exit;
+            }
 
             $route = $this->route->get_from_request($request);
 
@@ -67,6 +71,31 @@
             else {
                 return null;
             }
+        }
+
+        function get_sitemap() {
+            header('Content-Type: text/xml');
+
+            $result = "";
+            $result .= "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
+            $result .= "<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">\n";
+
+            $root = substr($_SERVER["HTTP_HOST"].$_SERVER["REQUEST_URI"], 0, -11);
+            $routes = $this->route->get_all_routes();
+            array_unshift($routes, "");
+
+            foreach($routes as &$route) {
+                $route = $root.$route;
+            }
+            unset($route);
+
+            foreach($routes as $route) {
+                $result .= "\t<url><loc>$route</loc></url>\n";
+            }
+
+            $result .= "</urlset>";
+
+            echo $result;
         }
     }
 

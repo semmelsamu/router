@@ -13,7 +13,7 @@
 
             $params = array_replace($default_params, $params);
 
-            foreach  ($default_params as $key => $val) {
+            foreach($default_params as $key => $val) {
                 $this->$key = array_key_exists($key, $params) ? $params[$key] : $val;
             }
         }
@@ -52,6 +52,18 @@
                     }
                 }
             }
+        }
+
+        function get_all_routes() {
+            $result = array();
+            foreach($this->routes as $route => $value) {
+                array_push($result, $route);
+                $sub_routes = $value->get_all_routes();
+                foreach($sub_routes as $sub_route) {
+                    array_push($result, $route."/".$sub_route);
+                }
+            }
+            return $result;
         }
     }
 

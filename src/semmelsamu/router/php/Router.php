@@ -14,10 +14,15 @@
             if(!isset($request)) {
                 $request = $this->get_path_list($this->get_uri());
             }
+
+            $old_request = $request;
+
             if(array_shift($request) == "sitemap.xml") {
                 $this->get_sitemap();
-                exit;
+                die;
             }
+
+            $request = $old_request;
 
             $route = $this->route->get_from_request($request);
 

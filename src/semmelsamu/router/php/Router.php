@@ -118,24 +118,25 @@
 
             header('Content-type: image/jpg');
 
-            list($width, $height) = getimagesize($filename);
-
             if(isset($_GET["s"])) {
+
+                list($width, $height) = getimagesize($filename);
+
                 $new_width = $_GET["s"];
+                $new_height = ($new_width / $width) * $height;
+
+                $image_p = imagecreatetruecolor($new_width, $new_height);
+                $image = imagecreatefromjpeg($filename);
+                imagecopyresampled($image_p, $image, 0, 0, 0, 0, $new_width, $new_height, $width, $height);
+
+                imagejpeg($image_p);
+                exit;
             }
             else {
-                $new_width = $width;
+
+                readfile($filename);
+                exit;
             }
-
-            $new_height = ($new_width / $width) * $height;
-
-            $image_p = imagecreatetruecolor($new_width, $new_height);
-            $image = imagecreatefromjpeg($filename);
-            imagecopyresampled($image_p, $image, 0, 0, 0, 0, $new_width, $new_height, $width, $height);
-
-            imagejpeg($image_p);
-
-            exit;
 
         }
 

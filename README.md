@@ -132,11 +132,11 @@ This function is intended for linking static files in your site, e.g. css, js or
 <link rel="stylesheet" href="<?= $router->route_rel('static/css') ?>style.css">
 ```
 
-### Sitemap
+## Sitemap
 
 The router automatically generates a sitemap from the routes specified. It can be accessed when typing in the `url/sitemap.xml`. If one route should be not displayed, it can be [hidden](#visible).
 
-### Scaling images
+## Scaling images
 
 With this router you can scale images. It only supports jpgs at the moment. Just append the size at the end of the url:
 

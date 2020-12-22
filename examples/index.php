@@ -21,5 +21,4 @@
     echo "<br>Relative path to root: ";
     echo $router->route_rel();
 
-
 ?>

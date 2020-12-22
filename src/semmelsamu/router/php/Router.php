@@ -30,6 +30,17 @@
                 if($route) {
                     include($route->file);
                 }
+                else if(file_exists($this->get_uri())) {
+                    $file = $this->get_uri();
+                    if(exif_imagetype($file) == IMAGETYPE_JPEG) {
+                        $this->jpgscaled($file);
+                    }
+                    else {
+                        header("Content-Type: ".mime_content_type($file));
+                        readfile($file);
+                        exit;
+                    }
+                }
                 else {
                     include($this->default_page);
                 }
@@ -38,7 +49,7 @@
         }
 
         private function get_uri() {
-            return substr(parse_url($_SERVER["REQUEST_URI"])["path"], strlen(substr(getcwd(), strlen($_SERVER["DOCUMENT_ROOT"]))));
+            return substr(parse_url($_SERVER["REQUEST_URI"])["path"], strlen(substr(getcwd(), strlen($_SERVER["DOCUMENT_ROOT"])))+1);
         }
 
         private function get_path_list($uri) {
@@ -102,6 +113,32 @@
 
             echo $result;
         }
+
+        function jpgscaled($filename) {
+
+            header('Content-type: image/jpg');
+
+            list($width, $height) = getimagesize($filename);
+
+            if(isset($_GET["s"])) {
+                $new_width = $_GET["s"];
+            }
+            else {
+                $new_width = $width;
+            }
+
+            $new_height = ($new_width / $width) * $height;
+
+            $image_p = imagecreatetruecolor($new_width, $new_height);
+            $image = imagecreatefromjpeg($filename);
+            imagecopyresampled($image_p, $image, 0, 0, 0, 0, $new_width, $new_height, $width, $height);
+
+            imagejpeg($image_p);
+
+            exit;
+
+        }
+
     }
 
 ?>

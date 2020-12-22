@@ -36,7 +36,13 @@
                         $this->jpgscaled($file);
                     }
                     else {
-                        header("Content-Type: ".mime_content_type($file));
+                        $content_type = mime_content_type($file);
+
+                        if(substr($file, -2) == "js") $content_type = "application/javascript";
+                        if(substr($file, -3) == "css") $content_type = "text/css";
+                        if(substr($file, -3) == "svg") $content_type = "image/svg+xml";
+
+                        header("Content-Type: ".$content_type);
                         readfile($file);
                         exit;
                     }

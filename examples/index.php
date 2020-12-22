@@ -2,6 +2,9 @@
 
     include("../src/semmelsamu/router/index.php");
 
+    use \semmelsamu\Router;
+    use \semmelsamu\Route;
+
     $router = new Router(new Route(["file" => "htdocs/index.php", "id" => "start", "routes" => [
         "site" => new Route(["file" => "htdocs/site.php", "id" => "site", "routes" => [
             "sub" => new Route(["file" => "htdocs/sub.php", "id" => "sub", "accept_args" => true]),

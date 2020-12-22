@@ -1,6 +1,6 @@
 # Router
 
-> Simple & fast PHP router
+> This router lets you create custom urls for your website, automatically creates a sitemap and lets you scale images via the url.
 
 ## Requirements
 
@@ -16,7 +16,6 @@ Create a `.htaccess` file which redirects all requests to one PHP file. The `.ht
 
 ```htaccess
 RewriteEngine On
-RewriteCond %{REQUEST_FILENAME} !-f
 RewriteRule ^(.+)$ index.php [QSA,L]
 ```
 
@@ -24,6 +23,13 @@ In the redirected PHP file, include the `index.php` file:
 
 ```php
 include("router/index.php");
+```
+
+We use namespacing, so use the namespace for the class:
+
+```php
+use \semmelsamu\Router;
+use \semmelsamu\Route;
 ```
 
 Then, you need to create a new `Router` class. This is the main class which handles all the routing and url managing.<br>
@@ -55,7 +61,7 @@ The Route class accepts the following parameters:
 ### accept_args
 
 - Specifies if the route accepts further parts of the url as arguments or not.
-- Default: `false`
+- Type: `bool`, default: `false`
 
 ### id
 
@@ -66,6 +72,11 @@ The Route class accepts the following parameters:
 - Specifies sub-routes or subdirectories. 
 - Type: Array, which holds the further `Route` classes.
 
+### visible
+
+- Specifies if this route should be shown in the sitemap.
+- Type: `bool`, default: `true`
+
 ## Examples
 
 To make sense of all that, here is an example, how the main file could look:
@@ -74,6 +85,9 @@ To make sense of all that, here is an example, how the main file could look:
 <?php
 
     include("router/index.php");
+
+    use \semmelsamu\Router;
+    use \semmelsamu\Route;
 
     $router = new Router(new Route(["file" => "htdocs/index.php", "routes" => [
         "site" => new Route(["file" => "htdocs/site.php", "routes" => [
@@ -117,3 +131,21 @@ This function is intended for linking static files in your site, e.g. css, js or
 ```html
 <link rel="stylesheet" href="<?= $router->route_rel('static/css') ?>style.css">
 ```
+
+### Sitemap
+
+The router automatically generates a sitemap from the routes specified. It can be accessed when typing in the `url/sitemap.xml`. If one route should be not displayed, it can be [hidden](#visible).
+
+### Scaling images
+
+With this router you can scale images. It only supports jpgs at the moment. Just append the size at the end of the url:
+
+```
+./path/to/your/image.jpg?s=200
+```
+
+- `?s=` specifies the size of the smallest side of the image.
+- `?w=` specifies the width of the image.
+- `?w=` specifies the height of the image.
+
+Only one option can be applied at the same time.

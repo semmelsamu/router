@@ -1,169 +1,127 @@
 <?php
 
-    class Router {
+namespace semmelsamu;
 
-        private $route;
-        private $default_page;
+class Router {
 
-        function __construct($route, $default_page) {
-            $this->route = $route;
-            $this->default_page = $default_page;
+    private $route;
+    private $default_page;
+
+    function __construct($route, $default_page) {
+        $this->route = $route;
+        $this->default_page = $default_page;
+    }
+
+    public function route($request = null, $include_file = true) {
+        if(!isset($request)) {
+            $request = $this->get_path_list($this->get_uri());
         }
 
-        public function route($request = null, $include_file = true) {
-            if(!isset($request)) {
-                $request = $this->get_path_list($this->get_uri());
+        $old_request = $request;
+
+        if(array_shift($request) == "sitemap.xml") {
+            $this->get_sitemap();
+            die;
+        }
+
+        $request = $old_request;
+
+        $route = $this->route->get_from_request($request);
+
+        if($include_file) {
+            if($route) {
+                include($route->file);
             }
-
-            $old_request = $request;
-
-            if(array_shift($request) == "sitemap.xml") {
-                $this->get_sitemap();
-                die;
-            }
-
-            $request = $old_request;
-
-            $route = $this->route->get_from_request($request);
-
-            if($include_file) {
-                if($route) {
-                    include($route->file);
-                }
-                else if(file_exists($this->get_uri())) {
-                    $file = $this->get_uri();
-                    if(exif_imagetype($file) == IMAGETYPE_JPEG) {
-                        $this->jpgscaled($file);
-                    }
-                    else {
-                        $content_type = mime_content_type($file);
-
-                        if(substr($file, -2) == "js") $content_type = "application/javascript";
-                        if(substr($file, -3) == "css") $content_type = "text/css";
-                        if(substr($file, -3) == "svg") $content_type = "image/svg+xml";
-
-                        header("Content-Type: ".$content_type);
-                        readfile($file);
-                        exit;
-                    }
+            else if(file_exists(urldecode($this->get_uri()))) {
+                $file = urldecode($this->get_uri());
+                if(exif_imagetype($file) == IMAGETYPE_JPEG) {
+                    Jpgscaler::jpgscaled($file);
                 }
                 else {
-                    include($this->default_page);
+                    $content_type = mime_content_type($file);
+
+                    if(substr($file, -2) == "js") $content_type = "application/javascript";
+                    if(substr($file, -3) == "css") $content_type = "text/css";
+                    if(substr($file, -3) == "svg") $content_type = "image/svg+xml";
+
+                    header("Content-Type: ".$content_type);
+                    readfile($file);
+                    exit;
                 }
-            }
-            return $route;
-        }
-
-        private function get_uri() {
-            return substr(parse_url($_SERVER["REQUEST_URI"])["path"], strlen(substr(getcwd(), strlen($_SERVER["DOCUMENT_ROOT"])))+1);
-        }
-
-        private function get_path_list($uri) {
-            return array_values(array_map("strtolower", array_filter(explode("/", $uri))));
-        }
-
-        public function route_rel($to = "") {
-            $from = $this->get_path_list(substr($this->get_uri(), 0, strrpos($this->get_uri(), "/")));
-            $to = $this->get_path_list($to);
-
-            
-            while(!empty($from) && !empty($to) && $from[0] == $to[0]) {
-                array_shift($from);
-                array_shift($to);
-            }
-
-            $result = str_repeat("../", sizeof($from)).implode("/", $to);
-
-            if($result == "") {
-                $result = ".";
-            }
-
-            if(substr($result, -1) != "/") {
-                $result .= "/";
-            }
-
-            return $result;
-        }
-
-        function route_id($id) {
-            $to = substr($this->route->get_uri_from_id($id), 0, -1);
-            if(isset($to)) {
-                return $this->route_rel($to);
             }
             else {
-                return null;
+                include($this->default_page);
             }
         }
-
-        function get_sitemap() {
-            header('Content-Type: text/xml');
-
-            $result = "";
-            $result .= "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
-            $result .= "<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">\n";
-
-            $root = substr($_SERVER["HTTP_HOST"].$_SERVER["REQUEST_URI"], 0, -11);
-            $routes = $this->route->get_all_routes();
-            array_unshift($routes, "");
-
-            foreach($routes as &$route) {
-                $route = $root.$route;
-            }
-            unset($route);
-
-            foreach($routes as $route) {
-                $result .= "\t<url><loc>$route</loc></url>\n";
-            }
-
-            $result .= "</urlset>";
-
-            echo $result;
-        }
-
-        function jpgscaled($filename) {
-
-            header('Content-type: image/jpg');
-
-            if(isset($_GET["s"]) || isset($_GET["w"]) || isset($_GET["h"])) {
-
-                list($width, $height) = getimagesize($filename);
-
-                if(isset($_GET["s"])) {
-
-                    if($height < $width) {
-                        $new_height = $_GET["s"];
-                        $new_width = ($new_height / $height) * $width;
-                    }
-                    else {
-                        $new_width = $_GET["s"];
-                        $new_height = ($new_width / $width) * $height;
-                    }
-
-                }
-                else if(isset($_GET["w"])) {
-                    $new_width = $_GET["w"];
-                    $new_height = ($new_width / $width) * $height;
-                }
-                else if(isset($_GET["h"])) {
-                    $new_height = $_GET["h"];
-                    $new_width = ($new_height / $height) * $width;
-                }
-
-                $image_p = imagecreatetruecolor($new_width, $new_height);
-                $image = imagecreatefromjpeg($filename);
-                imagecopyresampled($image_p, $image, 0, 0, 0, 0, $new_width, $new_height, $width, $height);
-
-                imagejpeg($image_p);
-                exit;
-            }
-            else {
-
-                readfile($filename);
-                exit;
-            }
-
-        }
-
+        return $route;
     }
+
+    private function get_uri() {
+        return substr(parse_url($_SERVER["REQUEST_URI"])["path"], strlen(substr(getcwd(), strlen($_SERVER["DOCUMENT_ROOT"])))+1);
+    }
+
+    private function get_path_list($uri) {
+        return array_values(array_map("strtolower", array_filter(explode("/", $uri))));
+    }
+
+    public function route_rel($to = "") {
+        $from = $this->get_path_list(substr($this->get_uri(), 0, strrpos($this->get_uri(), "/")));
+        $to = $this->get_path_list($to);
+
+        
+        while(!empty($from) && !empty($to) && $from[0] == $to[0]) {
+            array_shift($from);
+            array_shift($to);
+        }
+
+        $result = str_repeat("../", sizeof($from)).implode("/", $to);
+
+        if($result == "") {
+            $result = ".";
+        }
+
+        if(substr($result, -1) != "/") {
+            $result .= "/";
+        }
+
+        return $result;
+    }
+
+    function route_id($id) {
+        $to = substr($this->route->get_uri_from_id($id), 0, -1);
+        if(isset($to)) {
+            return $this->route_rel($to);
+        }
+        else {
+            return null;
+        }
+    }
+
+    function get_sitemap() {
+        header('Content-Type: text/xml');
+
+        $result = "";
+        $result .= "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
+        $result .= "<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">\n";
+
+        $root = substr($_SERVER["HTTP_HOST"].$_SERVER["REQUEST_URI"], 0, -11);
+        $routes = $this->route->get_all_routes();
+        array_unshift($routes, "");
+
+        foreach($routes as &$route) {
+            $route = $root.$route;
+        }
+        unset($route);
+
+        foreach($routes as $route) {
+            $result .= "\t<url><loc>$route</loc></url>\n";
+        }
+
+        $result .= "</urlset>";
+
+        echo $result;
+    }
+
+}
 
 ?>

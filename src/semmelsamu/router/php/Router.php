@@ -1,5 +1,5 @@
 <?php
-
+/*
 namespace semmelsamu;
 
 class Router {
@@ -29,7 +29,7 @@ class Router {
         $route = $this->route->get_from_request($request);
 
         if($include_file) {
-            if($route) {
+            if(isset($route)) {
                 include($route->file);
             }
             else if(file_exists(urldecode($this->get_uri()))) {
@@ -56,11 +56,11 @@ class Router {
         return $route;
     }
 
-    private function get_uri() {
-        return substr(parse_url($_SERVER["REQUEST_URI"])["path"], strlen(substr(getcwd(), strlen($_SERVER["DOCUMENT_ROOT"])))+1);
+    function get_uri() {
+        return substr($_SERVER["REQUEST_URI"], strrpos($_SERVER['PHP_SELF'], "/"));
     }
 
-    private function get_path_list($uri) {
+    function get_path_list($uri) {
         return array_values(array_map("strtolower", array_filter(explode("/", $uri))));
     }
 
@@ -123,5 +123,5 @@ class Router {
     }
 
 }
-
+*/
 ?>

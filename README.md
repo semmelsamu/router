@@ -5,6 +5,7 @@
 ## Requirements
 
 - PHP
+- Apache Webserver (or any other webserver as long as it can redirect requests)
 
 ## Installation
 

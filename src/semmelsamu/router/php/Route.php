@@ -2,11 +2,24 @@
 
 namespace semmelsamu;
 
+/**
+ * Main Route class, routes urls and provides useful file linking functions
+ *
+ * @author Samuel Kroiß
+ * @version 0.4
+ */
 class Route 
 {
+    /**
+     * __construct
+     * Route constructor
+     * 
+     * @param string $file path to the Route's file
+     * @param array $routes Sub-Routes
+     * @return void
+     */
     function __construct($file, $routes = [])
     {
-
         $this->file = $file;
         $this->routes = $routes;
 
@@ -14,6 +27,12 @@ class Route
         $this->url = strpos($this->url, "?") ? substr($this->url, 0, strpos($this->url, "?")) : $this->url;
     }
 
+    /**
+     * route
+     * Includes the corresponding file
+     * 
+     * @return array Further arguments
+     */
     function route() 
     {
         // If the url directs to a file, we output the file:
@@ -32,10 +51,17 @@ class Route
             exit;
         }
 
+        // TODO: 404 if sizeof array > 0
         return $this->route_inner();
     }
 
-    // Actual routing business.
+    /**
+     * route_inner
+     * Actual routing business.
+     * 
+     * @param array $routes Routes to work off
+     * @return array Further arguments
+     */
     function route_inner($routes = null)
     {
         // If we are the first route, create route array to work on.
@@ -63,96 +89,29 @@ class Route
         return $routes;
     }
 
+    /**
+     * base
+     * Returns the relative path to the root directory. Intended for HTML <base> tag.
+     * 
+     * @return string Relative path to root directory
+     */
     function base()
     {
         return str_repeat("../", substr_count($this->url, "/"));
     }
 
+    /**
+     * to
+     * Returns the relative path to the route $id.
+     * 
+     * @param string $id The route the relative part should go to
+     * @return string Relative path to the route
+     */
     function to($id) 
     {
         $path = "";
         return $path;
     }
 }
-
-
-
-
-
-
-
-
-/*
-
-    function __construct($params = []) {
-
-        $default_params = [
-            "file" => null,
-            "id" => null,
-            "accept_args" => false,
-            "routes" => [],
-            "visible" => true,
-        ];
-
-        $params = array_replace($default_params, $params);
-
-        foreach($default_params as $key => $val) {
-            $this->$key = array_key_exists($key, $params) ? $params[$key] : $val;
-        }
-    }
-
-    function get_from_request($request) {
-
-        $this->args = [];
-
-        if(sizeof($request) > 0) {
-            if(sizeof($this->routes) > 0 && array_key_exists($request[0], $this->routes)) {
-                $current_request = array_shift($request);
-                return $this->routes[$current_request]->get_from_request($request);
-            }
-            else {
-                if($this->accept_args) {
-                    $this->args = $request;
-                    return $this;
-                }
-            }
-        }
-        else {
-            return $this;
-        }
-
-    }
-
-    function get_uri_from_id($id) {
-        if($id == $this->id) {
-            return ".";
-        }
-        else {
-            foreach($this->routes as $key => $route) {
-                $result = $route->get_uri_from_id($id);
-                if(isset($result)) {
-                    return $key."/".$result;
-                }
-            }
-        }
-    }
-
-    function get_all_routes() {
-        $result = array();
-        foreach($this->routes as $route => $value) {
-            if($value->visible) {
-                array_push($result, $route);
-                $sub_routes = $value->get_all_routes();
-                foreach($sub_routes as $sub_route) {
-                    array_push($result, $route."/".$sub_route);
-                }
-            }
-        }
-        return $result;
-    }
-}
-
-
-*/
 
 ?>

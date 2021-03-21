@@ -2,8 +2,17 @@
 
 namespace semmelsamu;
 
+/**
+ * jpegscaled
+ * Outputs a JPEG image, scaled via the url parameters w(idth), h(eight) and s(ize of smallest side)
+ *
+ * @author Samuel Kroiß
+ * @version 0.2
+ * 
+ * @param string $filename path to the JPEG image
+ * @return void
+ */
 function jpegscaled($filename) {
-
 
     header('Content-type: image/jpeg');
 

@@ -104,7 +104,7 @@ class Route
     function sitemap($base, $prefix = "")
     {
         if($this->visible)
-            secho "\t<url><loc>$base$prefix</loc></url>\n";
+            echo "\t<url><loc>$base$prefix</loc></url>\n";
 
         foreach($this->routes as $key => $route)
         {

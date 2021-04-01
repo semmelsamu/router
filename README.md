@@ -1,5 +1,6 @@
 # Router
 
+> This Readme is outdated, i will update it soon.
 > This router lets you create custom urls for your website, automatically creates a sitemap and lets you scale images via the url.
 
 ## Requirements

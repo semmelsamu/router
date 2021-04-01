@@ -7,7 +7,7 @@ namespace semmelsamu;
  * Routes urls and provides useful file linking functions
  *
  * @author Samuel Kroiß
- * @version 0.4
+ * @version 0.4.1
  */
 class Router
 {

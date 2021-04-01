@@ -13,7 +13,7 @@ Copy the `src/semmelsamu/router` folder to a static location on your webserver.
 
 ## Setup
 
-Create a `.htaccess` file which redirects all requests to one PHP file. The `.htaccess` file could look something like this:
+Create a `.htaccess` file which redirects all requests to one PHP file. Also, the htaccess file needs to be configured that every url ens with a trailing slash. The `.htaccess` file could look something like this:
 
 ```htaccess
 RewriteEngine On
@@ -35,10 +35,10 @@ use \semmelsamu\Router;
 ```
 
 Then, you need to create a new `Router` class. This is the main class which handles all the routing and url managing.<br>
-The `Router` class requires 2 arguments. The first argument is an array containing all your options, and the second argument is the [route tree](#the-route-tree).
+The `Router` class requires 2 arguments. The first argument is the [route tree](#the-route-tree), and the second argument is an array containing all your options.
 
 ```php
-$router = new Router(["option1" => "value1", "option2" => "value2", ...], [...]);
+$router = new Router(["file" => ..., "routes" => [...]], ["option1" => "value1", "option2" => "value2", ...]);
 ```
 
 After that, call the routers main function, `route()`.
@@ -48,46 +48,6 @@ $router->route();
 ```
 
 After that, you're all set up! It is now time to configure your router.
-
-## Options
-
-### htdocs_folder
-
-- Type: `string`
-- Default: `"htdocs/"`
-- This prefix will be applied to all files `"file" => [...]` from the routes and the error document `"error_document" => [...]`.
-
-### error_document
-
-- Type: `string`
-- Default: `"404.php"`
-- This file will be included if no matching route was found.
-
-### enable_sitemap
-
-- Type: `boolean`
-- Default: `true`
-- Specifies if the [sitemap()](###sitemap) function should be on or not.
-
-### file_modifiers
-
-- Type: `boolean`
-- Default: `true`
-- Specifies if file modifiers should be activated or not.
-
-With file modifiers you can control how files on your server should be outputted to the user. At the moment, the only file modifier is the image scaler:
-
-It only supports JEPGs at the moment. Just append the desired image size at the end of the url:
-
-```
-/path/to/your/image.jpg?s=200
-```
-
-- `?s=` specifies the size of the smallest side of the image.
-- `?w=` specifies the width of the image.
-- `?w=` specifies the height of the image.
-
-Only one option can be applied at the same time.
 
 ## The Route tree
 
@@ -130,6 +90,46 @@ The route tree is an array, containing the index route and further sub-routes (l
 - Default: `false`
 - If not false, specify to redirect to another route with the id of the value of goto
 
+## Options
+
+### htdocs_folder
+
+- Type: `string`
+- Default: `"htdocs/"`
+- This prefix will be applied to all files `"file" => [...]` from the routes and the error document `"error_document" => [...]`.
+
+### error_document
+
+- Type: `string`
+- Default: `"404.php"`
+- This file will be included if no matching route was found.
+
+### enable_sitemap
+
+- Type: `boolean`
+- Default: `true`
+- Specifies if the [sitemap()](###sitemap) function should be on or not.
+
+### file_modifiers
+
+- Type: `boolean`
+- Default: `true`
+- Specifies if file modifiers should be activated or not.
+
+With file modifiers you can control how files on your server should be outputted to the user. At the moment, the only file modifier is the image scaler:
+
+It only supports JEPGs at the moment. Just append the desired image size at the end of the url:
+
+```
+/path/to/your/image.jpg?s=200
+```
+
+- `?s=` specifies the size of the smallest side of the image.
+- `?w=` specifies the width of the image.
+- `?w=` specifies the height of the image.
+
+Only one option can be applied at the same time.
+
 ## Examples
 
 To make sense of all that, here is an example, how the main file could look:
@@ -142,10 +142,6 @@ To make sense of all that, here is an example, how the main file could look:
     use \semmelsamu\Router;
 
     $router = new Router(
-    [
-        "htdocs_folder" => "htdocs/",
-        "error_document" => "404.php"
-    ],
     [
         "file" => "index.php",
         "routes" => [
@@ -170,6 +166,10 @@ To make sense of all that, here is an example, how the main file could look:
                 "goto" => "about" ]
 
         ]
+    ],
+    [
+        "htdocs_folder" => "htdocs/",
+        "error_document" => "404.php"
     ]
     );
 

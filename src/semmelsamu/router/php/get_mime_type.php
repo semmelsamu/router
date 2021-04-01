@@ -38,7 +38,7 @@ function get_mime_types($mime_file_url = "https://svn.apache.org/repos/asf/httpd
  * Returns MIME-Type of a file
  *
  * @author Samuel Kroiß
- * @version 0.1
+ * @version 0.2
  * 
  * @param string $filename The file
  * @return string $mime_types The MIME-Type of the file

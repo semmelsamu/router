@@ -50,6 +50,9 @@
 
 ?>
 
+<!-- Basic styling, nothing fancy -->
+<style> body { padding: 32px; box-sizing: border-box; max-width: 1280px; } </style>
+
 <base href="<?= $router->base() ?>">
 
 <ul>

@@ -108,7 +108,7 @@ The route tree is an array, containing the index route and further sub-routes (l
 
 - Type: `boolean`
 - Default: `true`
-- Specifies if the [sitemap()](###sitemap) function should be on or not.
+- Specifies if the [sitemap()](#sitemap) function should be on or not.
 
 ### file_modifiers
 

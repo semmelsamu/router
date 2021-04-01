@@ -20,7 +20,7 @@ class Router
      * __construct
      * Router constructor
      */
-    function __construct($options, $index_route)
+    function __construct($index_route, $options)
     {
         $default_options = [
             "htdocs_folder" => "htdocs/",

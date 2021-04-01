@@ -35,7 +35,7 @@ use \semmelsamu\Router;
 ```
 
 Then, you need to create a new `Router` class. This is the main class which handles all the routing and url managing.<br>
-The `Router` class requires 2 arguments. The first argument is the [route tree](#the-route-tree), and the second argument is an array containing all your options.
+The `Router` class accepts 2 arguments. The first argument is the [route tree](#the-route-tree), and the second argument is an array containing all your options.
 
 ```php
 $router = new Router(["file" => ..., "routes" => [...]], ["option1" => "value1", "option2" => "value2", ...]);

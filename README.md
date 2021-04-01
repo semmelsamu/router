@@ -1,12 +1,11 @@
 # Router
 
-> This Readme is outdated, i will update it soon.
-> This router lets you create custom urls for your website, automatically creates a sitemap and lets you scale images via the url.
+> With this router you can create custom urls for your Website. Other features are a auto-generated sitemap, an image scaler and redirects.
 
 ## Requirements
 
 - PHP
-- Apache Webserver (or any other webserver as long as it can redirect requests)
+- Any webserver which can redirect requests to a specific file
 
 ## Installation
 
@@ -18,7 +17,9 @@ Create a `.htaccess` file which redirects all requests to one PHP file. The `.ht
 
 ```htaccess
 RewriteEngine On
-RewriteRule ^(.+)$ index.php [QSA,L]
+RewriteCond %{REQUEST_URI} !(/$|\.) 
+RewriteRule (.*) %{REQUEST_URI}/ [R=301,L] 
+RewriteRule . index.php [QSA,L]
 ```
 
 In the redirected PHP file, include the `index.php` file:
@@ -31,14 +32,13 @@ We use namespacing, so use the namespace for the class:
 
 ```php
 use \semmelsamu\Router;
-use \semmelsamu\Route;
 ```
 
 Then, you need to create a new `Router` class. This is the main class which handles all the routing and url managing.<br>
-The `Router` class needs 2 arguments. The first is your index route (explained [here](#the-route-class)), the second is your 404 file, which gets included if you call the route function, but no matching route was found.
+The `Router` class requires 2 arguments. The first argument is an array containing all your options, and the second argument is the [route tree](#the-route-tree).
 
 ```php
-$router = new Router(new Route([]), "404.php");
+$router = new Router(["option1" => "value1", "option2" => "value2", ...], [...]);
 ```
 
 After that, call the routers main function, `route()`.
@@ -47,37 +47,88 @@ After that, call the routers main function, `route()`.
 $router->route();
 ```
 
-Now you're all set up! It is now time to configure your routes.
+After that, you're all set up! It is now time to configure your router.
 
-## The Route class
+## Options
 
-Imagine the Route class as a virtual directory on your Server, which the user can get to with the corresponding url. <br>
-The First parameter from your Router class is the starting directory, or the index route. From there, you can create sub-routes, which then correspond to the subdirectories in the url.
+### htdocs_folder
 
-The Route class accepts the following parameters:
+- Type: `string`
+- Default: `"htdocs/"`
+- This prefix will be applied to all files `"file" => [...]` from the routes and the error document `"error_document" => [...]`.
+
+### error_document
+
+- Type: `string`
+- Default: `"404.php"`
+- This file will be included if no matching route was found.
+
+### enable_sitemap
+
+- Type: `boolean`
+- Default: `true`
+- Specifies if the [sitemap()](###sitemap) function should be on or not.
+
+### file_modifiers
+
+- Type: `boolean`
+- Default: `true`
+- Specifies if file modifiers should be activated or not.
+
+With file modifiers you can control how files on your server should be outputted to the user. At the moment, the only file modifier is the image scaler:
+
+It only supports JEPGs at the moment. Just append the desired image size at the end of the url:
+
+```
+/path/to/your/image.jpg?s=200
+```
+
+- `?s=` specifies the size of the smallest side of the image.
+- `?w=` specifies the width of the image.
+- `?w=` specifies the height of the image.
+
+Only one option can be applied at the same time.
+
+## The Route tree
+
+Imagine the route tree as a virtual file system. Each route is a virtual directory, linked to a file. The user can then enter the url to the virtual directory and then will be redirected to the linked file.<br>
+The route tree is an array, containing the index route and further sub-routes (like a folder containing files and sub-folders). Specify the route as followed:
 
 ### file
 
+- Type: `string`
+- Default: `"index.php"`
 - The file to which this route should link.
-
-### accept_args
-
-- Specifies if the route accepts further parts of the url as arguments or not.
-- Type: `bool`, default: `false`
 
 ### id
 
-- The id which can then be linked to again.
+- Type: `string` or `int`
+- Default: `0`
+- The unique id which can be refered to.
 
 ### routes
 
-- Specifies sub-routes or subdirectories. 
-- Type: Array, which holds the further `Route` classes.
+- Type: `array`
+- Default: `[]`
+- Specifies sub-routes or subdirectories, which hold the further `Route` classes.
+
+### accept_arguments
+
+- Type: `bool`
+- Default: `false`
+- Specifies if the route accepts further parts of the url as arguments or not.
 
 ### visible
 
+- Type: `bool`
+- Default: `true`
 - Specifies if this route should be shown in the sitemap.
-- Type: `bool`, default: `true`
+
+### goto
+
+- Type: `string` or `int` or `bool`
+- Default: `false`
+- If not false, specify to redirect to another route with the id of the value of goto
 
 ## Examples
 
@@ -86,16 +137,41 @@ To make sense of all that, here is an example, how the main file could look:
 ```php
 <?php
 
-    include("router/index.php");
+    include("../src/semmelsamu/router/index.php");
 
     use \semmelsamu\Router;
-    use \semmelsamu\Route;
 
-    $router = new Router(new Route(["file" => "htdocs/index.php", "routes" => [
-        "site" => new Route(["file" => "htdocs/site.php", "routes" => [
-            "sub" => new Route(["file" => "htdocs/sub.php"]),
-        ]])
-    ]]), "htdocs/404.php");
+    $router = new Router(
+    [
+        "htdocs_folder" => "htdocs/",
+        "error_document" => "404.php"
+    ],
+    [
+        "file" => "index.php",
+        "routes" => [
+
+            "blog" => [
+            "file" => "blog.php",
+            "id" => "blog",
+            "visible" => true,
+            "routes" => [
+
+                "edit" => [
+                "file" => "edit_post.php",
+                "visible" => false, ]
+                
+            ]],
+
+            "about" => [
+            "file" => "about.php",
+            "id" => "about" ],
+
+            "about-us" => [
+                "goto" => "about" ]
+
+        ]
+    ]
+    );
 
     $router->route();
 
@@ -104,50 +180,78 @@ To make sense of all that, here is an example, how the main file could look:
 
 ## Other functions
 
-The `Router` class provides 2 other functions, which help you to link your dynamic pages to static directories on your server.
+The `Router` class also provides other useful functions:
 
-### route_id
+### id
 
 ```php
-$router -> route_id ( string $id ) : string
+$router -> id ( string $id ) : string
 ```
 
-Returns the relative path to the route with the id `$id`.
+Returns the url to the Route with the id `$id`
 
 This function is intended for getting the link hrefs for your site:
 
 ```html
-<a href="<?= $router->route_id('index') ?>">Home</a>
+<a href="<?= $router->id('start') ?>">Home</a>
 ```
 
-### route_rel
+### base
 
 ```php
-$router -> route_rel ( string $path = "" ) : string
+$router -> base ( void ) : string
 ```
 
-Returns the relative path to the directory with the absolute path `$path`.
+Returns the relative path to the base/root directory
 
-This function is intended for linking static files in your site, e.g. css, js or img files. If your css files are e.g. in `static/css`, you can use this function to dynamically get the relative path from the url to the file:
+This function is intended for use in the HTML `<base>` tag:
 
 ```html
-<link rel="stylesheet" href="<?= $router->route_rel('static/css') ?>style.css">
+<base href="<?= $router->base() ?>">
 ```
 
-## Sitemap
+### args
 
-The router automatically generates a sitemap from the routes specified. It can be accessed when typing in the `url/sitemap.xml`. If one route should be not displayed, it can be [hidden](#visible).
-
-## Scaling images
-
-With this router you can scale images. It only supports jpgs at the moment. Just append the size at the end of the url:
-
+```php
+$router -> args ( void ) : array
 ```
-./path/to/your/image.jpg?s=200
+If the route accepts args (further parts of the url), those will be stored here.
+
+### sitemap
+
+```php
+$router -> sitemap ( void ) : void
 ```
 
-- `?s=` specifies the size of the smallest side of the image.
-- `?w=` specifies the width of the image.
-- `?w=` specifies the height of the image.
+Print a basic sitemap of all visible sites mentioned in the route tree and terminate the script.
 
-Only one option can be applied at the same time.
+If `enable_sitemap` is set to `true` in the router options, this function will automatically be called when the user enters the url `/sitemap.xml`
+
+### url
+
+```php
+$router -> url ( void ) : string
+```
+
+Return the relative URL from the router root directory, without the PHP parameters
+
+### file
+
+```php
+$router -> file ( void ) : boolean
+```
+
+Return if the router will output a file and terminate the script when calling `route()`.
+
+Intended for if you want to include HTML (e.g. the head of the document) before you call the route function. Example:
+
+```php
+if(!$router->file()):
+
+    echo "<head>";
+    [...]
+
+endif;
+
+$router->route();
+```

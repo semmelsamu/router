@@ -178,6 +178,8 @@ To make sense of all that, here is an example, how the main file could look:
 ?>
 ```
 
+A bigger example and an example for the most basic router can be found in the examples folder.
+
 ## Other functions
 
 The `Router` class also provides other useful functions:

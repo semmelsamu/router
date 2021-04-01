@@ -47,7 +47,7 @@ function get_mime_type($filename) {
 
     $mime_types = get_mime_types();
 
-    $extension = substr($filename, 0, strrpos($filename, ".")+1);
+    $extension = substr($filename, strrpos($filename, ".")+1);
 
     if(array_key_exists($extension, $mime_types)) {
         return $mime_types[$extension];

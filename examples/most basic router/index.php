@@ -9,8 +9,6 @@
     // Create Router
     $router = new Router();
 
-    $router->url();
-
     // Route
     $router->route();
 

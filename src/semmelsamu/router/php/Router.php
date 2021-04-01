@@ -20,7 +20,7 @@ class Router
      * __construct
      * Router constructor
      */
-    function __construct($index_route, $options)
+    function __construct($index_route = [], $options = [])
     {
         $default_options = [
             "htdocs_folder" => "htdocs/",
@@ -48,7 +48,7 @@ class Router
     function url()
     {
         // Getting the Relative path from the root directory
-        $url = substr($_SERVER["REQUEST_URI"], strrpos($_SERVER['PHP_SELF'], "/")+1);
+        $url = substr(urldecode($_SERVER["REQUEST_URI"]), strrpos($_SERVER['PHP_SELF'], "/")+1);
 
         // Parts of the PHP arguments (everything afther the "?" and the "?" itself are not part of the url)
         $url = strpos($url, "?") ? substr($url, 0, strpos($url, "?")) : $url;

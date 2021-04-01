@@ -3,114 +3,113 @@
 namespace semmelsamu;
 
 /**
- * Main Route class, routes urls and provides useful file linking functions
+ * Route
  *
  * @author Samuel Kroiß
  * @version 0.4
  */
 class Route 
 {
-    /**
-     * __construct
-     * Route constructor
-     * 
-     * @param string $file path to the Route's file
-     * @param array $routes Sub-Routes
-     * @return void
-     */
-    function __construct($file, $routes = [])
-    {
-        $this->file = $file;
-        $this->routes = $routes;
+    public $file, $id, $accept_arguments, $visible, $routes, $goto;
 
-        $this->url = substr($_SERVER["REQUEST_URI"], strrpos($_SERVER['PHP_SELF'], "/")+1);
-        $this->url = strpos($this->url, "?") ? substr($this->url, 0, strpos($this->url, "?")) : $this->url;
+    function __construct($values)
+    {
+        $default_values = [
+            "file" => "index.php", // the file the route should include
+            "id" => 0, // the unique id of the route
+            "accept_arguments" => false, // if further parts of the url are given, still use this route and get the parts
+            "visible" => true, // should be included in the sitemap?
+            "routes" => [], // further sub-routes
+            "goto" => false // url which has the same route with the id
+        ];
+
+        $values = array_merge($default_values, $values);
+
+        $this->file = $values["file"];
+        $this->id = $values["id"];
+        $this->accept_arguments = $values["accept_arguments"];
+        $this->visible = $values["visible"];
+        $this->routes = $values["routes"];
+        $this->goto = $values["goto"];
+
+        foreach($this->routes as $key => $route_values)
+        {
+            $this->routes[$key] = new Route($route_values);
+        }
+        
     }
 
     /**
      * route
-     * Includes the corresponding file
-     * 
-     * @return array Further arguments
-     */
-    function route() 
-    {
-        // If the url directs to a file, we output the file:
-        // We don't allow the execution of PHP scripts when the file itself is accessed
-        if(file_exists($this->url) && substr($this->url, -4) != ".php") {
-
-            // It's a file, so we output the file:
-
-            $mime_type = get_mime_type($this->url);
-
-            if($mime_type == "image/jpeg" && function_exists("\semmelsamu\jpegscaled")) jpegscaled($this->url);
-
-            header("Content-Type: ".$mime_type);
-            readfile($this->url);
-
-            exit;
-        }
-
-        // TODO: 404 if sizeof array > 0
-        return $this->route_inner();
-    }
-
-    /**
-     * route_inner
      * Actual routing business.
      * 
      * @param array $routes Routes to work off
-     * @return array Further arguments
+     * @return array containing the file and further arguments. If no route was found, the function will return nothing.
      */
-    function route_inner($routes = null)
+    function route($routes)
     {
-        // If we are the first route, create route array to work on.
-        if(!isset($routes)) 
-        {
-            $routes = array_filter(explode("/", $this->url));
-        }
-
         // No more routes to check, we are at our goal:
-        if(sizeof($routes) == 0) 
+        if(empty($routes)) 
         {
-            include($this->file);
-            return [];
+            return ["file" => $this->file];
         }
 
-        // We have routes which correspind to the url, let them handle the request further:
+        // We have a route which corresponds to the url part, let it handle the request further:
         if(array_key_exists($routes[0], $this->routes))
         {
             $next_route = array_shift($routes);
-            return $this->routes[$next_route]->route_inner($routes);
+
+            // If it is a goto route, we return it to the parent class:
+            if($this->routes[$next_route]->goto)
+            {
+                return ["id" => $this->routes[$next_route]->goto];
+            }
+            return $this->routes[$next_route]->route($routes);
         }
-       
-        // No mathing routes. We stay at the furthest pont we know and return further parts of the url as arguments.
-        include($this->file);
-        return $routes;
+
+        // No mathing routes. We stay at the furthest pont we know and if wanted we return further parts of the url as arguments.
+        if($this->accept_arguments)
+        {
+            return ["file" => $this->file, "args" => $routes];
+        }
     }
 
     /**
-     * base
-     * Returns the relative path to the root directory. Intended for HTML <base> tag.
+     * id
+     * Returns the url to the Route with the id $id
      * 
-     * @return string Relative path to root directory
+     * @param string $id The id to which the url should go to
+     * @return string Url to the Route
      */
-    function base()
+    function id($id)
     {
-        return str_repeat("../", substr_count($this->url, "/"));
+        if($id == $this->id)
+        {
+            return "";
+        }
+        
+        foreach($this->routes as $key => $route)
+        {
+            $result = $route->id($id);
+            if($result === "" or $result)
+            {
+                return $key."/".$result;
+            }
+            
+        }
+
+        return false;
     }
 
-    /**
-     * to
-     * Returns the relative path to the route $id.
-     * 
-     * @param string $id The route the relative part should go to
-     * @return string Relative path to the route
-     */
-    function to($id) 
+    function sitemap($base, $prefix = "")
     {
-        $path = "";
-        return $path;
+        if($this->visible)
+            secho "\t<url><loc>$base$prefix</loc></url>\n";
+
+        foreach($this->routes as $key => $route)
+        {
+            $route->sitemap($base, $prefix.$key."/");
+        }
     }
 }
 

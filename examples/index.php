@@ -6,12 +6,6 @@
 
     $router = new Router(
     [
-        "htdocs_folder" => "htdocs/", // every file has this as prefix
-        "error_document" => "404.php", // if no matching route was found, this file is included
-        "enable_sitemap" => true, // outputs a sitemap of all visible routes
-        "file_modifiers" => true, // e.g. jpegscaler
-    ],
-    [
         "file" => "index.php", // the file the route should include
         "id" => "start", // the unique id of the route
         "accept_arguments" => false, // if further parts of the url are given, still use this route and get the parts
@@ -43,6 +37,12 @@
                 "goto" => "about" ] // url which has the same route with the id "about"
 
         ]
+    ],
+    [
+        "htdocs_folder" => "htdocs/", // every file has this as prefix
+        "error_document" => "404.php", // if no matching route was found, this file is included
+        "enable_sitemap" => true, // outputs a sitemap of all visible routes
+        "file_modifiers" => true, // e.g. jpegscaler
     ]
     );
 
@@ -84,7 +84,7 @@
 <p>url()</p>
 <?php db($router->url()); ?>
 
-<p><a href="<?= $router->base() ?>">base()</a></p>
+<p>base()</p>
 <?php db($router->base()); ?>
 
 <p><a href="<?= $router->id("edit_post") ?>">id("edit_post")</a></p>

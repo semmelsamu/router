@@ -112,7 +112,11 @@ class Router
         if(isset($route_result["file"]))
         {
             if(isset($route_result["args"])) $this->args = $route_result["args"];
-            include($this->htdocs_folder.$route_result["file"]);
+
+            $file = $this->htdocs_folder.$route_result["file"];
+
+            if(substr($file, -4) == ".php") include($file);
+            else $this->output_file($file);
         }
         // If the route only was an alias, we go to the route and run the function again:
         elseif(isset($route_result["id"]))

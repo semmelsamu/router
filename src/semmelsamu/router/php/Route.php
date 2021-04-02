@@ -83,7 +83,7 @@ class Route
      */
     function id($id)
     {
-        if($id == $this->id)
+        if($id === $this->id)
         {
             return "";
         }

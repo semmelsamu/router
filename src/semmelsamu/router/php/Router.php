@@ -75,7 +75,7 @@ class Router
         }
 
         header("Content-Type: ".$mime_type);
-        readfile($this->url());
+        readfile($file);
 
         exit;
     }

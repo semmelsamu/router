@@ -189,7 +189,16 @@ class Router
      * Return if the router will output a file and terminate the script when calling route()
      * @return boolean
      */
-    function file() { return file_exists($this->url()) || ($this->url() == "sitemap.xml" && $this->enable_sitemap); }
+    function file() { 
+        $route_result = $this->index_route->route(array_filter(explode("/", $this->url())));
+
+        if(isset($route_result["file"]) && substr($route_result["file"], -4) != ".php");
+        {
+            return true;
+        }
+
+        return file_exists($this->url()) || ($this->url() == "sitemap.xml" && $this->enable_sitemap); 
+    }
 
 }
 ?>

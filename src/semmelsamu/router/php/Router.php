@@ -190,14 +190,24 @@ class Router
      * @return boolean
      */
     function file() { 
-        $route_result = $this->index_route->route(array_filter(explode("/", $this->url())));
 
-        if(isset($route_result["file"]) && substr($route_result["file"], -4) != ".php");
+        $url = $this->url();
+
+        if((file_exists($url) && substr($url, -4) != ".php") || ($url == "sitemap.xml" && $this->enable_sitemap))
         {
             return true;
         }
 
-        return file_exists($this->url()) || ($this->url() == "sitemap.xml" && $this->enable_sitemap); 
+
+        $route_result = $this->index_route->route(array_filter(explode("/", $url)));
+
+        if(isset($route_result["is_file"]) && $route_result["is_file"]) 
+        {
+            return true;
+        }
+
+
+        return false; 
     }
 
 }

@@ -264,5 +264,3 @@ endif;
 
 $router->route();
 ```
-
-> **Important:** As a security measure, `file()` will not return true if the file is a PHP file. The source Code of PHP files will never be printed out, it will always be executed.

@@ -96,9 +96,16 @@ class Router
         }
 
         // If the url directs to a file, we output the file:
-        if(file_exists($url) && substr($url, -4) != ".php") 
+        if(file_exists($url)) 
         {
-            $this->output_file($url);
+            if(substr($url, -4) == ".php")
+            {
+                include($url);
+            }
+            else
+            {
+                $this->output_file($url);
+            }
         }
 
         // Split the url into an array, which we can work off:
@@ -193,7 +200,7 @@ class Router
 
         $url = $this->url();
 
-        if((file_exists($url) && substr($url, -4) != ".php") || ($url == "sitemap.xml" && $this->enable_sitemap))
+        if(file_exists($url) || ($url == "sitemap.xml" && $this->enable_sitemap))
         {
             return true;
         }

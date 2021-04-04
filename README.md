@@ -90,6 +90,12 @@ The route tree is an array, containing the index route and further sub-routes (l
 - Default: `false`
 - If not false, specify to redirect to another route with the id of the value of goto
 
+### is_file
+
+- Type: `bool`
+- Default: `false`
+- If set to true, this route behaves as a file, i.e. `Router->file()` returns true if this is the matching route.
+
 ## Options
 
 ### htdocs_folder
@@ -245,11 +251,12 @@ $router -> file ( void ) : boolean
 
 Return if the router will output a file and terminate the script when calling `route()`.
 
-Intended for if you want to include HTML (e.g. the head of the document) before you call the route function. Example:
+Intended for if you want to include HTML (e.g. the head of the document) before you call the route function. As HTML code in another file's code would corrupt the file, this function provides an easy "blocking" feature. Example:
 
 ```php
 if(!$router->file()):
 
+    // This will only be echoed if $router->route doesn't output a file that this code would corrupt
     echo "<head>";
     [...]
 
@@ -257,3 +264,5 @@ endif;
 
 $router->route();
 ```
+
+> **Important:** As a security measure, `file()` will not return true if the file is a PHP file. The source Code of PHP files will never be printed out, it will always be executed.

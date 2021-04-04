@@ -20,7 +20,8 @@ class Route
             "accept_arguments" => false, // if further parts of the url are given, still use this route and get the parts
             "visible" => true, // should be included in the sitemap?
             "routes" => [], // further sub-routes
-            "goto" => false // url which has the same route with the id
+            "goto" => false, // url which has the same route with the id
+            "is_file" => false, // if this route should behave as a file, means router->file() returns true if this is true
         ];
 
         $values = array_merge($default_values, $values);
@@ -31,6 +32,7 @@ class Route
         $this->visible = $values["visible"];
         $this->routes = $values["routes"];
         $this->goto = $values["goto"];
+        $this->is_file = $values["is_file"];
 
         foreach($this->routes as $key => $route_values)
         {
@@ -51,7 +53,7 @@ class Route
         // No more routes to check, we are at our goal:
         if(empty($routes)) 
         {
-            return ["file" => $this->file];
+            return ["file" => $this->file, "is_file" => $this->is_file];
         }
 
         // We have a route which corresponds to the url part, let it handle the request further:
@@ -70,7 +72,7 @@ class Route
         // No mathing routes. We stay at the furthest pont we know and if wanted we return further parts of the url as arguments.
         if($this->accept_arguments)
         {
-            return ["file" => $this->file, "args" => $routes];
+            return ["file" => $this->file, "args" => $routes, "is_file" => $this->is_file];
         }
     }
 

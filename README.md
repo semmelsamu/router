@@ -9,7 +9,7 @@
 
 ## Installation
 
-Copy the `src/semmelsamu/router` folder to a static location on your webserver.
+Copy the unzipped repository to a static location on your webserver.
 
 ## Setup
 

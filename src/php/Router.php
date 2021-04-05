@@ -133,6 +133,7 @@ class Router
         // No matching route found. Include error document.
         else
         {
+            http_response_code(404);
             include($this->htdocs_folder.$this->error_document);
         }
 

@@ -172,7 +172,8 @@ class Router
     {
         header('Content-Type: text/xml');
 
-        $base = substr($_SERVER["HTTP_HOST"].$_SERVER["REQUEST_URI"], 0, -11);
+        $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
+        $base = $protocol.substr($_SERVER["HTTP_HOST"].$_SERVER["REQUEST_URI"], 0, -11);
 
         echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
         echo "<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">\n";

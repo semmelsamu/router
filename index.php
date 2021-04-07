@@ -1,14 +1,14 @@
 <?php
 
 // debugging
-// include("src/php/db.php");
+// include("src/db.php");
 
 // add-on
-include("src/php/jpegscaled.php");
+include("src/jpegscaled.php");
 
 // required
-include("src/php/get_mime_type.php");
-include("src/php/Route.php");
-include("src/php/Router.php");
+include("src/get_mime_type.php");
+include("src/Route.php");
+include("src/Router.php");
 
 ?>

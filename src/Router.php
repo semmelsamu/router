@@ -88,6 +88,13 @@ class Router
      */
     function route($url = null)
     {
+        // The router needs a trailing slash at the end of the url to work.
+        if(substr($_SERVER["REQUEST_URI"], -1) != "/")
+        {
+            header("Location: ".$_SERVER["REQUEST_URI"]."/", true, 301);
+            die;
+        }
+
         if(!isset($url)) $url = $this->url();
 
         if($url == "sitemap.xml" && $this->enable_sitemap) 

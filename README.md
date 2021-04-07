@@ -13,12 +13,10 @@ Copy the unzipped repository to a static location on your webserver.
 
 ## Setup
 
-Create a `.htaccess` file which redirects all requests to one PHP file. Also, the htaccess file needs to be configured that every url ens with a trailing slash. The `.htaccess` file could look something like this:
+Create a `.htaccess` file which redirects all requests to one PHP file. The `.htaccess` file could look something like this:
 
 ```htaccess
 RewriteEngine On
-RewriteCond %{REQUEST_URI} !(/$|\.) 
-RewriteRule (.*) %{REQUEST_URI}/ [R=301,L] 
 RewriteRule . index.php [QSA,L]
 ```
 

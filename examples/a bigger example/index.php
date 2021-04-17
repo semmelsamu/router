@@ -1,6 +1,6 @@
 <?php
 
-    include("../../src/semmelsamu/router/index.php");
+    include("../../index.php");
 
     use \semmelsamu\Router;
 

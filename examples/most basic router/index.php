@@ -1,7 +1,7 @@
 <?php
 
     // Include lib
-    include("../../src/semmelsamu/router/index.php");
+    include("../../index.php");
 
     // Namespace
     use \semmelsamu\Router;

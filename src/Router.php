@@ -4,12 +4,61 @@ namespace semmelsamu;
 
 class Router
 {
-    /*
-        "htdocs_folder" => "htdocs/",
-        "error_document" => "404.php",
-        "enable_sitemap" => true, // outputs a sitemap of all visible routes
-        "file_modifiers" => true, // e.g. jpegscaler
-    */
+    private $htdocs_folder, $error_document, $enable_sitemap, $routes;
+
+    function __construct(
+        $htdocs_folder = "htdocs/", 
+        $error_document = "404.php",
+        $enable_sitemap = true,
+    )
+    {
+        $this->htdocs_folder = $htdocs_folder;
+        $this->error_document = $error_document;
+        $this->enable_sitemap = $enable_sitemap;
+        $this->routes = [];
+    }
+
+    // Getter & Setter
+
+    /**
+     * add
+     * adds one or multiple Routes to the Router.
+     * @param Route ...$routes The routes.
+     * @return null
+     */
+    function add(...$routes) 
+    {
+        foreach($routes as $route)
+        {
+            if(is_a($route, '\semmelsamu\Route'))
+                array_push($this->routes, $route);
+        }
+    }
+
+    // Main Route
+
+    function route()
+    {
+        $url = $this->url();
+
+        $result = false;
+
+        foreach($this->routes as $route)
+        {
+            if($route->route($url))
+            {
+                $result = $route;
+                break;
+            }
+        }
+
+        if($result)
+        {
+            db($result);
+        }
+    }
+
+    // URL managing functions
 
     /**
      * url
@@ -27,6 +76,19 @@ class Router
 
         return $url;
     }
+    
+    /**
+     * base
+     * Returns the relative path to the base/root directory
+     * 
+     * @return string Relative path to the base/root directory
+     */
+    function base()
+    {
+        return str_repeat("../", substr_count($this->url, "/"));
+    }
+
+    // Output functions
 
     /**
      * output_file
@@ -50,18 +112,6 @@ class Router
         readfile($this->url());
 
         exit;
-    }
-
-    /**
-     * base
-     * Returns the relative path to the base/root directory
-     * 
-     * @return string Relative path to the base/root directory
-     */
-    function base()
-    {
-        $url = $this->url();
-        return str_repeat("../", substr_count($url, "/"));
     }
 
     /**

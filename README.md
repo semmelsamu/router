@@ -4,16 +4,16 @@
 
 ## Requirements
 
-- PHP
+- PHP >= 8
 - Any webserver which can redirect requests to a specific file
 
 ## Installation
 
-Copy the `src/semmelsamu/router` folder to a static location on your webserver.
+Copy the repository to a static location on your webserver.
 
 ## Setup
 
-Create a `.htaccess` file which redirects all requests to one PHP file. Also, the htaccess file needs to be configured that every url ens with a trailing slash. The `.htaccess` file could look something like this:
+Create a `.htaccess` file which redirects all requests to one PHP file.  The `.htaccess` file could look something like this:
 
 ```htaccess
 RewriteEngine On

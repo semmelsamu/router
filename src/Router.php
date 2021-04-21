@@ -8,7 +8,7 @@ namespace semmelsamu;
  */
 class Router
 {
-    private $htdocs_folder, $error_document, $enable_sitemap, $routes;
+    private $htdocs_folder, $error_document, $enable_sitemap, $routes, $result;
 
     /**
      * Class constructor
@@ -49,24 +49,49 @@ class Router
 
     // Main Route
 
-    function route()
+    /**
+     * Main routing function
+     * @param bool $include specifies if the route should be included
+     * @return Route the route corresponding to the url
+     */
+    function route($include = true)
     {
-        $url = $this->url();
+        $result = $this->route_inner();
 
-        $result = false;
+        if($include)
+        {
+            if(isset($result))
+                include($this->htdocs_folder.$result->file);
+            else
+                include($this->htdocs_folder.$this->error_document);
+        }
+        
+        return $result;
+    }
 
+    private function route_inner($id = null)
+    {
+        // Loop through all routes and check if the url corresponds to any
         foreach($this->routes as $route)
         {
-            if($route->route($url))
+            if((isset($id) && $route->id == $id) || $route->route($this->url()))
             {
                 $result = $route;
                 break;
             }
         }
 
-        if($result)
+        // Found a corresponding route. Return, or, if goto is specified, run function again recursively
+        if(isset($result))
         {
-            db($result);
+            if($result->goto)
+            {
+                return $this->route_inner($result->goto);
+            }
+            else 
+            {
+                return $result;
+            }
         }
     }
 
@@ -84,6 +109,10 @@ class Router
         // Parts of the PHP arguments (everything afther the "?" and the "?" itself are not part of the url)
         $url = strpos($url, "?") ? substr($url, 0, strpos($url, "?")) : $url;
 
+        // No trailing slashes
+        if(substr($url, -1) == "/")
+            $url = substr($url, 0, -1);
+
         return $url;
     }
     
@@ -93,7 +122,31 @@ class Router
      */
     function base()
     {
-        return str_repeat("../", substr_count($this->url, "/"));
+        return str_repeat("../", substr_count($this->url(), "/"))."./";
+    }
+
+    /**
+     * Return the relative path to the route with the id $id
+     * Returns NULL if the Route's url is a regular expression
+     * @param int|string the id of the route
+     * @return string|null relative path to the route or NULL if the Route's url is a regular expression
+     */
+    function id($id)
+    {
+        foreach($this->routes as $route)
+        {
+            if($route->id == $id)
+            {
+                if(!$route->url_is_regex)
+                {
+                    return $route->url;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+        }
     }
 
     // Output functions

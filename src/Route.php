@@ -13,36 +13,59 @@ class Route
      * 
      * @param string $url regular expression URL
      * @param string $file path to the file the route should include
-     * @param string $link the link to the route
      * @param int|string $id the unique id of the route
      * @param bool $visible specifies if the route should be included in the sitemap
-     * @param bool|int|string if not false, specifies the id of another route which this route refers to
+     * @param bool|int|string if not false, specifies the id of another route which this route refers to and makes the route invisible in the sitemap
      * 
      * @return null
      */
     function __construct(
-        $url = "/.*/",
+        $url = "/^$/",
         $file = "index.php",
-        $link = "",
         $id = 0,
-        $visible = true,
+        $visible = 1,
         $goto = false,
     )
     {
+        if(substr($url, 0, 1) == "/" && substr($url, -1) == "/")
+            $this->url_is_regex = true;
+        else
+            $this->url_is_regex = false;
+
         $this->url = $url;
-        $this->file = $file;
-        $this->link = $link;
-        $this->id = $id;
+
+
+        if($goto && $visible == 1) 
+            $visible = false;
+        else
+            $visible = true;
+
         $this->visible = $visible;
+
+
         $this->goto = $goto;
+        $this->file = $file;
+        $this->id = $id;
     }
 
     function route($url) 
     {
-        if(preg_match($this->url, $url, $matches))
+        $this->matches = [];
+
+        if($this->url_is_regex)
         {
-            $this->matches = $matches;
-            return true;
+            if(preg_match($this->url, $url, $this->matches))
+            {
+                $this->matches = $this->matches;
+                return true;
+            }
+        }
+        else
+        {
+            if($this->url == $url)
+            {
+                return true;
+            }
         }
 
         return false;

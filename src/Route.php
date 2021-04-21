@@ -2,18 +2,36 @@
 
 namespace semmelsamu;
 
+/**
+ * Route
+ * @author semmelsamu
+ */
 class Route 
 {
+    /**
+     * Class constructor
+     * 
+     * @param string $url regular expression URL
+     * @param string $file path to the file the route should include
+     * @param string $link the link to the route
+     * @param int|string $id the unique id of the route
+     * @param bool $visible specifies if the route should be included in the sitemap
+     * @param bool|int|string if not false, specifies the id of another route which this route refers to
+     * 
+     * @return null
+     */
     function __construct(
-        $url = "/.*/", // Regular expression URL
-        $file = "index.php", // the file the route should include
-        $id = 0, // the unique id of the route
-        $visible = true, // should be included in the sitemap?
-        $goto = false // url which has the same route with the id
+        $url = "/.*/",
+        $file = "index.php",
+        $link = "",
+        $id = 0,
+        $visible = true,
+        $goto = false,
     )
     {
         $this->url = $url;
         $this->file = $file;
+        $this->link = $link;
         $this->id = $id;
         $this->visible = $visible;
         $this->goto = $goto;

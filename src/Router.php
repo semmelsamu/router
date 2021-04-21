@@ -2,10 +2,23 @@
 
 namespace semmelsamu;
 
+/**
+ * Router
+ * @author semmelsamu
+ */
 class Router
 {
     private $htdocs_folder, $error_document, $enable_sitemap, $routes;
 
+    /**
+     * Class constructor
+     * 
+     * @param string $htdocs_folder the folder, i.e. the prefix for all files
+     * @param string $error_document path to the 404 document
+     * @param bool $enable_sitemap specifies if the router should auto-generate a /sitemap.xml
+     * 
+     * @return null
+     */
     function __construct(
         $htdocs_folder = "htdocs/", 
         $error_document = "404.php",
@@ -21,9 +34,8 @@ class Router
     // Getter & Setter
 
     /**
-     * add
-     * adds one or multiple Routes to the Router.
-     * @param Route ...$routes The routes.
+     * Add one or multiple Routes to the Router
+     * @param Route ...$routes the routes
      * @return null
      */
     function add(...$routes) 
@@ -61,9 +73,7 @@ class Router
     // URL managing functions
 
     /**
-     * url
-     * Returns the relative URL from the router root directory, without the PHP parameters
-     * 
+     * Return the relative URL from the router root directory, without the PHP parameters
      * @return string the relative URL from the router root directory, without the PHP parameters
      */
     function url()
@@ -78,10 +88,8 @@ class Router
     }
     
     /**
-     * base
-     * Returns the relative path to the base/root directory
-     * 
-     * @return string Relative path to the base/root directory
+     * Return the relative path to the base/root directory
+     * @return string the relative path to the base/root directory
      */
     function base()
     {
@@ -91,9 +99,7 @@ class Router
     // Output functions
 
     /**
-     * output_file
-     * Outputs a file to the user and ends the script.
-     * 
+     * Output a file to the user and end the script
      * @param string $file path to the file
      * @return void
      */

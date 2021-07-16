@@ -4,7 +4,7 @@
 include("src/db.php");
 
 // add-on
-include("src/jpegscaled.php");
+include("src/imagescaled.php");
 
 // required
 include("src/get_mime_type.php");

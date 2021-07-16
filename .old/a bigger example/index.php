@@ -2,6 +2,9 @@
 
     include("../../index.php");
 
+    \semmelsamu\imagescaled(filename: "files/screenshot.jpg");
+    exit;
+
     use \semmelsamu\Router;
     use \semmelsamu\Route;
 

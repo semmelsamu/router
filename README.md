@@ -17,8 +17,6 @@ Create a `.htaccess` file which redirects all requests to one PHP file.  The `.h
 
 ```htaccess
 RewriteEngine On
-RewriteCond %{REQUEST_URI} !(/$|\.) 
-RewriteRule (.*) %{REQUEST_URI}/ [R=301,L] 
 RewriteRule . index.php [QSA,L]
 ```
 
@@ -89,6 +87,12 @@ The route tree is an array, containing the index route and further sub-routes (l
 - Type: `string` or `int` or `bool`
 - Default: `false`
 - If not false, specify to redirect to another route with the id of the value of goto
+
+### is_file
+
+- Type: `bool`
+- Default: `false`
+- If set to true, this route behaves as a file, i.e. `Router->file()` returns true if this is the matching route.
 
 ## Options
 
@@ -245,11 +249,12 @@ $router -> file ( void ) : boolean
 
 Return if the router will output a file and terminate the script when calling `route()`.
 
-Intended for if you want to include HTML (e.g. the head of the document) before you call the route function. Example:
+Intended for if you want to include HTML (e.g. the head of the document) before you call the route function. As HTML code in another file's code would corrupt the file, this function provides an easy "blocking" feature. Example:
 
 ```php
 if(!$router->file()):
 
+    // This will only be echoed if $router->route doesn't output a file that this code would corrupt
     echo "<head>";
     [...]
 

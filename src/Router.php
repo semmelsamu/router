@@ -60,18 +60,18 @@ class Router
      */
     function route($include = true)
     {
-        $result = $this->route_inner();
+        $this->result = $this->route_inner();
 
         if($include)
         {
-            if(isset($result))
-                include($this->htdocs_folder.$result->file);
+            if(isset($this->result))
+                include($this->htdocs_folder.$this->result->file);
 
             else
                 include($this->htdocs_folder.$this->error_document);
         }
         
-        return $result;
+        return $this->result;
     }
 
     private function route_inner($id = null)

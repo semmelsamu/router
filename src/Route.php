@@ -14,8 +14,8 @@ class Route
      * @param string $url regular expression URL
      * @param string $file path to the file the route should include
      * @param int|string $id the unique id of the route
-     * @param bool $visible specifies if the route should be included in the sitemap
      * @param bool|int|string if not false, specifies the id of another route which this route refers to and makes the route invisible in the sitemap
+     * @param array $tags
      * 
      * @return null
      */
@@ -23,8 +23,8 @@ class Route
         $url = "/^$/",
         $file = "index.php",
         $id = 0,
-        $visible = 1,
         $goto = false,
+        $tags = [],
     )
     {
         if(substr($url, 0, 1) == "/" && substr($url, -1) == "/")
@@ -34,18 +34,10 @@ class Route
 
         $this->url = $url;
 
-
-        if($goto && $visible == 1) 
-            $visible = false;
-        else
-            $visible = true;
-
-        $this->visible = $visible;
-
-
         $this->goto = $goto;
         $this->file = $file;
         $this->id = $id;
+        $this->tags = $tags;
     }
 
     function route($url) 

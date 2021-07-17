@@ -4,114 +4,71 @@ namespace semmelsamu;
 
 /**
  * Route
- *
- * @author Samuel Kroiß
- * @version 0.4
+ * @author semmelsamu
  */
 class Route 
 {
-    public $file, $id, $accept_arguments, $visible, $routes, $goto;
-
-    function __construct($values)
+    /**
+     * Class constructor
+     * 
+     * @param string $url regular expression URL
+     * @param string $file path to the file the route should include
+     * @param int|string $id the unique id of the route
+     * @param bool $visible specifies if the route should be included in the sitemap
+     * @param bool|int|string if not false, specifies the id of another route which this route refers to and makes the route invisible in the sitemap
+     * 
+     * @return null
+     */
+    function __construct(
+        $url = "/^$/",
+        $file = "index.php",
+        $id = 0,
+        $visible = 1,
+        $goto = false,
+    )
     {
-        $default_values = [
-            "file" => "index.php", // the file the route should include
-            "id" => 0, // the unique id of the route
-            "accept_arguments" => false, // if further parts of the url are given, still use this route and get the parts
-            "visible" => true, // should be included in the sitemap?
-            "routes" => [], // further sub-routes
-            "goto" => false, // url which has the same route with the id
-            "is_file" => false, // if this route should behave as a file, means router->file() returns true if this is true
-        ];
+        if(substr($url, 0, 1) == "/" && substr($url, -1) == "/")
+            $this->url_is_regex = true;
+        else
+            $this->url_is_regex = false;
 
-        $values = array_merge($default_values, $values);
+        $this->url = $url;
 
-        $this->file = $values["file"];
-        $this->id = $values["id"];
-        $this->accept_arguments = $values["accept_arguments"];
-        $this->visible = $values["visible"];
-        $this->routes = $values["routes"];
-        $this->goto = $values["goto"];
-        $this->is_file = $values["is_file"];
 
-        foreach($this->routes as $key => $route_values)
-        {
-            $this->routes[$key] = new Route($route_values);
-        }
-        
+        if($goto && $visible == 1) 
+            $visible = false;
+        else
+            $visible = true;
+
+        $this->visible = $visible;
+
+
+        $this->goto = $goto;
+        $this->file = $file;
+        $this->id = $id;
     }
 
-    /**
-     * route
-     * Actual routing business.
-     * 
-     * @param array $routes Routes to work off
-     * @return array containing the file and further arguments. If no route was found, the function will return nothing.
-     */
-    function route($routes)
+    function route($url) 
     {
-        // No more routes to check, we are at our goal:
-        if(empty($routes)) 
-        {
-            return ["file" => $this->file, "is_file" => $this->is_file];
-        }
+        $this->matches = [];
 
-        // We have a route which corresponds to the url part, let it handle the request further:
-        if(array_key_exists($routes[0], $this->routes))
+        if($this->url_is_regex)
         {
-            $next_route = array_shift($routes);
-
-            // If it is a goto route, we return it to the parent class:
-            if($this->routes[$next_route]->goto)
+            if(preg_match($this->url, $url, $this->matches))
             {
-                return ["id" => $this->routes[$next_route]->goto];
+                $this->matches = $this->matches;
+                return true;
             }
-            return $this->routes[$next_route]->route($routes);
         }
-
-        // No mathing routes. We stay at the furthest pont we know and if wanted we return further parts of the url as arguments.
-        if($this->accept_arguments)
+        else
         {
-            return ["file" => $this->file, "args" => $routes, "is_file" => $this->is_file];
-        }
-    }
-
-    /**
-     * id
-     * Returns the url to the Route with the id $id
-     * 
-     * @param string $id The id to which the url should go to
-     * @return string Url to the Route
-     */
-    function id($id)
-    {
-        if($id === $this->id)
-        {
-            return "";
-        }
-        
-        foreach($this->routes as $key => $route)
-        {
-            $result = $route->id($id);
-            if($result === "" or $result)
+            if($this->url == $url)
             {
-                return $key."/".$result;
+                return true;
             }
-            
         }
 
         return false;
-    }
-
-    function sitemap($base, $prefix = "")
-    {
-        if($this->visible)
-            echo "\t<url><loc>$base$prefix</loc></url>\n";
-
-        foreach($this->routes as $key => $route)
-        {
-            $route->sitemap($base, $prefix.$key."/");
-        }
     }
 }
 

@@ -3,10 +3,10 @@
 /**
  * db
  * Short debugging function
- * Outputs contents of a variable
+ * Outputs the contents of a variable in readable HTML
  *
  * @author Samuel Kroiß
- * @version 0.1
+ * @version 1.0
  * 
  * @param string $var The variable
  * @return void

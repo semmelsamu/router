@@ -14,17 +14,15 @@ class Route
      * @param string $url regular expression URL
      * @param string $file path to the file the route should include
      * @param int|string $id the unique id of the route
-     * @param bool|int|string if not false, specifies the id of another route which this route refers to and makes the route invisible in the sitemap
-     * @param array $tags
+     * @param bool|int|string $goto if not false, specifies the id of another route which this route refers to and makes the route invisible in the sitemap
      * 
      * @return null
      */
     function __construct(
         $url = "/^$/",
         $file = "index.php",
-        $id = 0,
+        $id = null,
         $goto = false,
-        $tags = [],
     )
     {
         if(substr($url, 0, 1) == "/" && substr($url, -1) == "/")
@@ -32,12 +30,16 @@ class Route
         else
             $this->url_is_regex = false;
 
+        if(substr($file, -4) == ".php")
+            $this->file_is_php = true;
+        else
+            $this->file_is_php = false;
+
         $this->url = $url;
 
         $this->goto = $goto;
         $this->file = $file;
         $this->id = $id;
-        $this->tags = $tags;
     }
 
     function route($url) 

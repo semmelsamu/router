@@ -11,8 +11,12 @@
     $router->add(new Route(id: "blog", url: "blog", file: "blog.php"));
     $router->add(new Route(id: "about", url: "about", file: "about.php"));
     $router->add(new Route(url: "about-us", goto: "about"));
-    $router->add(new Route(id: "edit_post", url: "/blog\/id\/([0-9]*)\/edit/", file: "edit_post.php", visible: false));
-    $router->add(new Route(id: "comments", url: "/blog\/id\/([0-9]*)\/comments\/([0-9]*)/", file: "comments.php", visible: false));
+    $router->add(new Route(id: "edit_post", url: "/blog\/id\/([0-9]*)\/edit/", file: "edit_post.php"));
+    $router->add(new Route(id: "comments", url: "/blog\/id\/([0-9]*)\/comments\/([0-9]*)/", file: "comments.php"));
+
+    $router->route();
+
+    if(!$router->result->file_is_php) $router->output();
 
 ?>
 
@@ -30,7 +34,7 @@
 
 <hr>
 
-<?php db($router->route()); ?>
+<?= $router->output(); ?>
 
 <hr>
 

@@ -55,48 +55,64 @@ class Router
 
     /**
      * Main routing function
-     * @param bool $include specifies if the route should be included
-     * @return Route the route corresponding to the url
      */
-    function route($include = true)
+    function route($id = null)
     {
-        $this->result = $this->route_inner();
-
-        if($include)
-        {
-            if(isset($this->result))
-                include($this->htdocs_folder.$this->result->file);
-
-            else
-                include($this->htdocs_folder.$this->error_document);
-        }
-        
+        $this->result = $this->route_inner($id);
         return $this->result;
     }
 
-    private function route_inner($id = null)
+    function route_inner($id = null)
     {
+        if(is_file($this->url()))
+        {
+            return new Route(url: $this->url(), file: $this->url());
+        }
+
+        $result = null;
+
         // Loop through all routes and check if the url corresponds to any
         foreach($this->routes as $route)
         {
-            if((isset($id) && $route->id == $id) || $route->route($this->url()))
+            if($route->route($this->url()) || (isset($id) && $route->id == $id))
             {
                 $result = $route;
                 break;
             }
         }
 
-        // Found a corresponding route. Return it, or, if goto is specified, run function again recursively
-        if(isset($result))
+        // Check for goto
+        if(isset($result) && $result->goto)
         {
-            if($result->goto)
+            $result = $this->route($result->goto);
+        }
+
+        return $result;
+    }
+
+    /**
+     * Route (if not yet done) and output the routed file
+     */
+    function output()
+    {
+        if(!isset($this->result))
+            $this->route();
+
+        if(isset($this->result))
+        {
+            if(substr($this->result->file, -4) == ".php")
             {
-                return $this->route_inner($result->goto);
+                include($this->htdocs_folder.$this->result->file);
             }
-            else 
+            else
             {
-                return $result;
+                $this->output_file($this->result->file);
             }
+        }
+
+        else
+        {
+            include($this->htdocs_folder.$this->error_document);
         }
     }
 
@@ -153,6 +169,25 @@ class Router
                 }
             }
         }
+    }
+        
+    /**
+     * Output a file to the user and end the script
+     * @param string $file path to the file
+     * @return void
+     */
+    function output_file($file) 
+    {
+        if(!file_exists($file)) return;
+
+        // Return mime type ala mimetype extension
+        $finfo = finfo_open(FILEINFO_MIME_TYPE); 
+        $mime_type = finfo_file($finfo, $file);
+        finfo_close($finfo);
+
+        header("Content-Type: ".$mime_type);
+        readfile($this->url());
+        exit;
     }
 }
 ?>

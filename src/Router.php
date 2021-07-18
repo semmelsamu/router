@@ -9,7 +9,7 @@ namespace semmelsamu;
 class Router
 {
     public $htdocs_folder, $error_document;
-    private $routes, $result;
+    private $routes, $result, $mime_types;
 
     /**
      * Class constructor
@@ -181,9 +181,11 @@ class Router
         if(!file_exists($file)) return;
 
         // Return mime type ala mimetype extension
-        $finfo = finfo_open(FILEINFO_MIME_TYPE); 
-        $mime_type = finfo_file($finfo, $file);
-        finfo_close($finfo);
+        switch (substr($file, strrpos($file, ".")+1)) {
+            case "css": $mime_type = "text/css"; break;
+            case "css": $mime_type = "text/js"; break;
+            default: $mime_type = mime_content_type($file); break;
+        }
 
         header("Content-Type: ".$mime_type);
         readfile($this->url());

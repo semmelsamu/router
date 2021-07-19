@@ -59,6 +59,10 @@ class Router
     function route($id = null)
     {
         $this->result = $this->route_inner($id);
+
+        if(!isset($this->result))
+            $this->result = new Route(file: $this->error_document);
+
         return $this->result;
     }
 
@@ -98,21 +102,13 @@ class Router
         if(!isset($this->result))
             $this->route();
 
-        if(isset($this->result))
+        if(substr($this->result->file, -4) == ".php")
         {
-            if(substr($this->result->file, -4) == ".php")
-            {
-                include($this->htdocs_folder.$this->result->file);
-            }
-            else
-            {
-                $this->output_file($this->result->file);
-            }
+            include($this->htdocs_folder.$this->result->file);
         }
-
         else
         {
-            include($this->htdocs_folder.$this->error_document);
+            $this->output_file($this->result->file);
         }
     }
 
@@ -180,15 +176,16 @@ class Router
     {
         if(!file_exists($file)) return;
 
+
         // Return mime type ala mimetype extension
         switch (substr($file, strrpos($file, ".")+1)) {
             case "css": $mime_type = "text/css"; break;
-            case "css": $mime_type = "text/js"; break;
+            case "js": $mime_type = "text/javascript"; break;
             default: $mime_type = mime_content_type($file); break;
         }
 
         header("Content-Type: ".$mime_type);
-        readfile($this->url());
+        readfile($file);
         exit;
     }
 }

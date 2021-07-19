@@ -14,7 +14,7 @@ class Router
     /**
      * Class constructor
      * 
-     * @param string $htdocs_folder the folder, i.e. the prefix for all files
+     * @param string $htdocs_folder the folder where all your htdocs are
      * @param string $error_document path to the 404 document
      * 
      * @return null
@@ -66,7 +66,7 @@ class Router
         return $this->result;
     }
 
-    function route_inner($id = null)
+    private function route_inner($id = null)
     {
         if(is_file($this->url()))
         {
@@ -172,7 +172,7 @@ class Router
      * @param string $file path to the file
      * @return void
      */
-    function output_file($file) 
+    private function output_file($file) 
     {
         if(!file_exists($file)) return;
 

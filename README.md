@@ -1,11 +1,11 @@
 # Router
 
-> With this router you can create custom urls for your Website. Other features are a auto-generated sitemap, an image scaler and redirects.
+> Small php router with route linking and file redirects
 
 ## Requirements
 
-- PHP >= 8
-- Any webserver which can redirect requests to a specific file
+- PHP
+- Any webserver which can redirect requests to a specific file (e.g. via .htaccess)
 
 ## Installation
 
@@ -13,252 +13,158 @@ Copy the repository to a static location on your webserver.
 
 ## Setup
 
-Create a `.htaccess` file which redirects all requests to one PHP file.  The `.htaccess` file could look something like this:
+Redirect all requests to one PHP file (`index.php`). A possible solution with the `.htaccess` file could look something like this:
 
 ```htaccess
 RewriteEngine On
 RewriteRule . index.php [QSA,L]
 ```
 
-In the redirected PHP file, include the `index.php` file:
+In the redirected PHP file, include the router:
 
 ```php
 include("router/index.php");
 ```
 
-We use namespacing, so use the namespace for the class:
+We use namespacing, so use the namespace `semmelsamu` for the class:
 
 ```php
 use \semmelsamu\Router;
+use \semmelsamu\Route;
 ```
 
-Then, you need to create a new `Router` class. This is the main class which handles all the routing and url managing.<br>
-The `Router` class accepts 2 arguments. The first argument is the [route tree](#the-route-tree), and the second argument is an array containing all your options.
+## Router
 
 ```php
-$router = new Router(["file" => ..., "routes" => [...]], ["option1" => "value1", "option2" => "value2", ...]);
+new Router([$htdocs_folder, $error_document]) : void
 ```
 
-After that, call the routers main function, `route()`.
+Create a new instance of the router.
+
+#### Parameters
+
+- `$htdocs_folder`
+    - The folder where all your htdocs are.
+    - Type: `string`
+    - Default: `htdocs/`
+- `$error_document`
+    - The path to the 404 document
+    - Type: `string`
+    - Default: `404.php`
+
+### add
 
 ```php
-$router->route();
+Router::add($routes, [...$routes]]) : void
 ```
 
-After that, you're all set up! It is now time to configure your router.
+Add one or multiple [Routes](#routeclass) to the Router.
 
-## The Route tree
+#### Parameters
 
-Imagine the route tree as a virtual file system. Each route is a virtual directory, linked to a file. The user can then enter the url to the virtual directory and then will be redirected to the linked file.<br>
-The route tree is an array, containing the index route and further sub-routes (like a folder containing files and sub-folders). Specify the route as followed:
+- `$routes`
+    - The route(s).
+    - Type: `Route`
 
-### file
-
-- Type: `string`
-- Default: `"index.php"`
-- The file to which this route should link.
-
-### id
-
-- Type: `string` or `int`
-- Default: `0`
-- The unique id which can be refered to.
-
-### routes
-
-- Type: `array`
-- Default: `[]`
-- Specifies sub-routes or subdirectories, which hold the further `Route` classes.
-
-### accept_arguments
-
-- Type: `bool`
-- Default: `false`
-- Specifies if the route accepts further parts of the url as arguments or not.
-
-### visible
-
-- Type: `bool`
-- Default: `true`
-- Specifies if this route should be shown in the sitemap.
-
-### goto
-
-- Type: `string` or `int` or `bool`
-- Default: `false`
-- If not false, specify to redirect to another route with the id of the value of goto
-
-### is_file
-
-- Type: `bool`
-- Default: `false`
-- If set to true, this route behaves as a file, i.e. `Router->file()` returns true if this is the matching route.
-
-## Options
-
-### htdocs_folder
-
-- Type: `string`
-- Default: `"htdocs/"`
-- This prefix will be applied to all files `"file" => [...]` from the routes and the error document `"error_document" => [...]`.
-
-### error_document
-
-- Type: `string`
-- Default: `"404.php"`
-- This file will be included if no matching route was found.
-
-### enable_sitemap
-
-- Type: `boolean`
-- Default: `true`
-- Specifies if the [sitemap()](#sitemap) function should be on or not.
-
-### file_modifiers
-
-- Type: `boolean`
-- Default: `true`
-- Specifies if file modifiers should be activated or not.
-
-With file modifiers you can control how files on your server should be outputted to the user. At the moment, the only file modifier is the image scaler:
-
-It only supports JEPGs at the moment. Just append the desired image size at the end of the url:
-
-```
-/path/to/your/image.jpg?s=200
-```
-
-- `?s=` specifies the size of the smallest side of the image.
-- `?w=` specifies the width of the image.
-- `?w=` specifies the height of the image.
-
-Only one option can be applied at the same time.
-
-## Examples
-
-To make sense of all that, here is an example, how the main file could look:
+### route
 
 ```php
-<?php
-
-    include("../src/semmelsamu/router/index.php");
-
-    use \semmelsamu\Router;
-
-    $router = new Router(
-    [
-        "file" => "index.php",
-        "routes" => [
-
-            "blog" => [
-            "file" => "blog.php",
-            "id" => "blog",
-            "visible" => true,
-            "routes" => [
-
-                "edit" => [
-                "file" => "edit_post.php",
-                "visible" => false, ]
-                
-            ]],
-
-            "about" => [
-            "file" => "about.php",
-            "id" => "about" ],
-
-            "about-us" => [
-                "goto" => "about" ]
-
-        ]
-    ],
-    [
-        "htdocs_folder" => "htdocs/",
-        "error_document" => "404.php"
-    ]
-    );
-
-    $router->route();
-
-?>
+Router::route([$id]) : Route
 ```
 
-A bigger example and an example for the most basic router can be found in the examples folder.
+Set the current route.
 
-## Other functions
+#### Parameters
 
-The `Router` class also provides other useful functions:
+- `$id`
+    - If specified, set the route with the id `$id`.
+    - Type: `int|string`
 
-### id
+#### Return values
+
+Returns the current route.
+
+### output
 
 ```php
-$router -> id ( string $id ) : string
+Router::output() : void
 ```
 
-Returns the url to the Route with the id `$id`
-
-This function is intended for getting the link hrefs for your site:
-
-```html
-<a href="<?= $router->id('start') ?>">Home</a>
-```
-
-### base
-
-```php
-$router -> base ( void ) : string
-```
-
-Returns the relative path to the base/root directory
-
-This function is intended for use in the HTML `<base>` tag:
-
-```html
-<base href="<?= $router->base() ?>">
-```
-
-### args
-
-```php
-$router -> args ( void ) : array
-```
-If the route accepts args (further parts of the url), those will be stored here.
-
-### sitemap
-
-```php
-$router -> sitemap ( void ) : void
-```
-
-Print a basic sitemap of all visible sites mentioned in the route tree and terminate the script.
-
-If `enable_sitemap` is set to `true` in the router options, this function will automatically be called when the user enters the url `/sitemap.xml`
+Output the current route.
 
 ### url
 
 ```php
-$router -> url ( void ) : string
+Router::url([$trailing_slashes]) : string
 ```
 
 Return the relative URL from the router root directory, without the PHP parameters
 
-### file
+#### Parameters
+
+- `$trailing_slashes`
+    - States if trailing slashes are allowed.
+    - Type: `bool`
+
+#### Return values
+
+Returns the relative URL from the router root directory, without the PHP parameters
+
+### base
 
 ```php
-$router -> file ( void ) : boolean
+Router::base() : string
 ```
 
-Return if the router will output a file and terminate the script when calling `route()`.
+Return the relative path to the base/root directory
 
-Intended for if you want to include HTML (e.g. the head of the document) before you call the route function. As HTML code in another file's code would corrupt the file, this function provides an easy "blocking" feature. Example:
+#### Return values
+
+Returns the relative path to the base/root directory
+
+### id
 
 ```php
-if(!$router->file()):
-
-    // This will only be echoed if $router->route doesn't output a file that this code would corrupt
-    echo "<head>";
-    [...]
-
-endif;
-
-$router->route();
+Router::id($id) : string
 ```
+
+Return the relative path to the route with a specific id
+
+#### Parameters
+
+- `$id`
+    - The id of the route.
+    - Type: `bool`
+
+#### Return values
+
+Returns the relative path to the route or `NULL` if the Route's url is a regular expression
+
+
+<a id="routeclass"></a>
+## Route
+
+```php
+new Route([$url, $file, $id, $goto]) : void
+```
+
+Create a new Route.
+
+#### Parameters
+
+- `$url`
+    - The url to the route or a regular expression that matches the url.
+    - Type: `string|regex`
+    - Default: `/^$/`
+- `$file`
+    - The path to the file the route should refer to.
+    - Type: `string`
+    - Default: `index.php`
+- `$id`
+    - The unique id of the route.
+    - Type: `string|int`
+    - Default: `NULL`
+- `$goto`
+    - If not `false`, specifies the id of another Route this Route is an alias for.
+    - Type: `bool|int|string`
+    - Default: `false`

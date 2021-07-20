@@ -22,7 +22,7 @@ class Route
         $url = "/^$/",
         $file = "index.php",
         $id = null,
-        $goto = false,
+        $goto = false
     )
     {
         $this->url = $url;

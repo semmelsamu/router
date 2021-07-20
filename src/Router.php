@@ -61,7 +61,7 @@ class Router
         $this->result = $this->route_inner($id);
 
         if(!isset($this->result))
-            $this->result = new Route(file: $this->error_document);
+            $this->result = new Route(null, $this->error_document);
 
         return $this->result;
     }
@@ -70,7 +70,7 @@ class Router
     {
         if(is_file($this->url()))
         {
-            return new Route(url: $this->url(), file: $this->url());
+            return new Route($this->url(), $this->url());
         }
 
         $result = null;

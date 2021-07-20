@@ -1,6 +1,6 @@
 # Router
 
-> Small php router with route linking and file redirects
+> Small PHP router with route linking and file redirects
 
 ## Requirements
 

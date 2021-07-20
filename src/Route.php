@@ -25,21 +25,17 @@ class Route
         $goto = false,
     )
     {
+        $this->url = $url;
+        $this->file = $file;
+        $this->id = $id;
+        $this->goto = $goto;
+        
+        $this->file_extension = substr($file, strrpos($file, ".")+1);
+        
         if(substr($url, 0, 1) == "/" && substr($url, -1) == "/")
             $this->url_is_regex = true;
         else
             $this->url_is_regex = false;
-
-        if(substr($file, -4) == ".php")
-            $this->file_is_php = true;
-        else
-            $this->file_is_php = false;
-
-        $this->url = $url;
-
-        $this->goto = $goto;
-        $this->file = $file;
-        $this->id = $id;
     }
 
     function route($url) 

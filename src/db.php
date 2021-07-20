@@ -1,1 +1,0 @@
-<?php function db($variable, $exit = false) {echo "\n\n<pre>"; var_dump($variable); echo "</pre>\n\n"; if($exit) exit;} ?>

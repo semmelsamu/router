@@ -22,13 +22,13 @@ class Route
         $url = "/^$/",
         $file = "index.php",
         $id = null,
-        $goto = false
+        $goto = false,
+        $tags = []
     )
     {
-        $this->url = $url;
-        $this->file = $file;
-        $this->id = $id;
-        $this->goto = $goto;
+        // Import all parameters
+        foreach(get_defined_vars() as $key => $val)
+            $this->$key = $val;
         
         $this->file_extension = substr($file, strrpos($file, ".")+1);
         

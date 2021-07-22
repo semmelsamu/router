@@ -7,12 +7,14 @@
 
     $router = new Router();
 
-    $router->add(new Route(id: "start"));
-    $router->add(new Route(id: "blog", url: "blog", file: "blog.php"));
-    $router->add(new Route(id: "about", url: "about", file: "about.php"));
-    $router->add(new Route(url: "about-us", goto: "about"));
-    $router->add(new Route(id: "edit_post", url: "/blog\/id\/([0-9]*)\/edit/", file: "edit_post.php"));
-    $router->add(new Route(id: "comments", url: "/blog\/id\/([0-9]*)\/comments\/([0-9]*)/", file: "comments.php"));
+    $router->add([
+        new Route(id: "start"),
+        new Route(id: "blog", url: "blog", file: "blog.php"),
+        new Route(id: "about", url: "about", file: "about.php"),
+        new Route(url: "about-us", goto: "about"),
+        new Route(id: "edit_post", url: "/blog\/id\/([0-9]*)\/edit/", file: "edit_post.php"),
+        new Route(id: "comments", url: "/blog\/id\/([0-9]*)\/comments\/([0-9]*)/", file: "comments.php")
+    ]);
 
     $router->route();
 

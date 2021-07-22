@@ -39,10 +39,10 @@ class Router
 
     /**
      * Add one or multiple Routes to the Router
-     * @param Route ...$routes the routes
+     * @param array $routes the Route(s) to add
      * @return null
      */
-    function add(...$routes) 
+    function add($routes) 
     {
         foreach($routes as $route)
         {

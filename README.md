@@ -55,7 +55,7 @@ Create a new instance of the router.
 ### add
 
 ```php
-Router::add($routes, [...$routes]]) : void
+Router::add($routes) : void
 ```
 
 Add one or multiple [Routes](#routeclass) to the Router.
@@ -64,7 +64,7 @@ Add one or multiple [Routes](#routeclass) to the Router.
 
 - `$routes`
     - The route(s).
-    - Type: `Route`
+    - Type: `Array`
 
 ### route
 

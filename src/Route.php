@@ -19,7 +19,7 @@ class Route
      * @return null
      */
     function __construct(
-        $url = "/^$/",
+        $url = "",
         $file = "index.php",
         $id = null,
         $goto = false,

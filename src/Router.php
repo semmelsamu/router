@@ -68,11 +68,6 @@ class Router
 
     private function route_inner($id = null)
     {
-        if(is_file($this->url()))
-        {
-            return new Route($this->url(), $this->url());
-        }
-
         $result = null;
 
         // Loop through all routes and check if the url corresponds to any
@@ -89,6 +84,14 @@ class Router
         if(isset($result) && $result->goto)
         {
             $result = $this->route($result->goto);
+        }
+
+        if(!isset($result))
+        {
+            if(is_file($this->url()))
+            {
+                $result = new Route($this->url(), $this->url());
+            }
         }
 
         return $result;

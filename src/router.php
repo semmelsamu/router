@@ -2,7 +2,7 @@
 
 namespace semmelsamu;
 
-include("src/Route.php");
+include("route.php");
 
 /**
  * Router

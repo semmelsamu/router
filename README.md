@@ -23,10 +23,9 @@ RewriteRule . index.php [QSA,L]
 In the redirected PHP file, include the router:
 
 ```php
-include("router/index.php");
+include("src/router.php");
 ```
-
-We use namespacing, so use the namespace `semmelsamu` for the class:
+Use the namespace `semmelsamu`:
 
 ```php
 use \semmelsamu\Router;

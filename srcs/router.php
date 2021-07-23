@@ -2,6 +2,8 @@
 
 namespace semmelsamu;
 
+include("src/Route.php");
+
 /**
  * Router
  * @author semmelsamu

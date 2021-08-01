@@ -2,6 +2,10 @@
 
 namespace semmelsamu;
 
+define("HTTPS", 0x1);
+define("NO_WWW", 0x2);
+define("NO_TRAILING_SLASHES", 0x4);
+
 include("route.php");
 
 /**
@@ -10,7 +14,7 @@ include("route.php");
  */
 class Router
 {
-    public $htdocs_folder, $error_document;
+    public $htdocs_folder, $error_document, $flags;
     private $routes, $result, $mime_types;
 
     /**
@@ -18,16 +22,25 @@ class Router
      * 
      * @param string $htdocs_folder the folder where all your htdocs are
      * @param string $error_document path to the 404 document
+     * @param flags HTTPS, NO_WWW, NO_TRAILING_SLASHES
      * 
      * @return null
      */
     function __construct(
         $htdocs_folder = "htdocs/", 
-        $error_document = "404.php"
+        $error_document = "404.php",
+        $beautify_url = HTTPS | NO_WWW | NO_TRAILING_SLASHES
     )
     {
-        $this->htdocs_folder = $htdocs_folder;
-        $this->error_document = $error_document;
+        // Import all parameters
+        foreach(get_defined_vars() as $key => $val)
+            $this->$key = $val;
+
+        if($beautify_url !== false)
+        {
+            $this->beautify_url($beautify_url);
+        }
+        
         $this->routes = [];
     }
 
@@ -118,6 +131,50 @@ class Router
     }
 
     // URL managing functions
+
+    private function beautify_url($flags)
+    {
+        $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
+
+        $location = $protocol . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+        $new_location = $location;
+
+        
+        if($flags & HTTPS)
+        {
+            $protocol = "https://";
+            $new_location = $protocol . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+        }
+
+        if($flags & NO_WWW)
+        {
+            if(substr($_SERVER['HTTP_HOST'], 0, 4) == "www.")
+            {
+                $new_location = $protocol . substr($_SERVER['HTTP_HOST'], 4) . $_SERVER['REQUEST_URI'];
+            }
+        }
+
+        if($flags & NO_TRAILING_SLASHES)
+        {
+            if(substr($new_location, -1) == "/")
+            {
+                $new_location = substr($new_location, 0, -1);
+            }
+        }
+
+        db($location);
+        db($new_location,1);
+
+
+        // URL changed, redirect
+        if($new_location != $location)
+        {
+            header("Link: <$location>; rel=\"canonical\"");
+            header("HTTP/1.1 301 Moved Permanently");
+            header("Location: $location");
+            exit;
+        }
+    }
 
     /**
      * Return the relative URL from the router root directory, without the PHP parameters

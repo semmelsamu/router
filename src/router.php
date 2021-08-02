@@ -6,7 +6,7 @@ class Router
 {
     function __construct()
     {
-        $this->url = trim(substr($_SERVER["REQUEST_URI"], strlen(dirname($_SERVER["PHP_SELF"]))), "/");
+        $this->url = trim(substr(urldecode(parse_url($_SERVER["REQUEST_URI"])["path"]), strlen(dirname($_SERVER["PHP_SELF"]))), "/");
 
         $this->base = str_repeat("../", substr_count(substr($_SERVER["REQUEST_URI"], strlen(dirname($_SERVER["PHP_SELF"]))), "/")-1);
         $this->base = $this->base == "" ? "./" : $this->base;
@@ -48,6 +48,13 @@ class Router
         $this->callback_404 = $callback;
     }
 
+    function call_404()
+    {
+        http_response_code(404);
+        if(is_callable($this->callback_404))
+            call_user_func($this->callback_404);
+    }
+
     function route()
     {
         foreach($this->routes as $route)
@@ -76,8 +83,7 @@ class Router
         {
             if(isset($this->callback_404) && is_callable($this->callback_404))
             {
-                http_response_code(404);
-                call_user_func($this->callback_404);
+                $this->call_404();
             }
         }
     }
@@ -88,4 +94,3 @@ class Router
             return $this->routes[$id]["url"];
     }
 }
-?>

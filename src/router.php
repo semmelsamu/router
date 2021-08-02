@@ -7,6 +7,10 @@ class Router
     function __construct()
     {
         $this->url = trim(substr($_SERVER["REQUEST_URI"], strlen(dirname($_SERVER["PHP_SELF"]))), "/");
+
+        $this->base = str_repeat("../", substr_count(substr($_SERVER["REQUEST_URI"], strlen(dirname($_SERVER["PHP_SELF"]))), "/")-1);
+        $this->base = $this->base == "" ? "./" : $this->base;
+        
         $this->matches = [];
 
         $this->routes = [];
@@ -15,15 +19,16 @@ class Router
 
     function add(
         $callback,
-        $url = "/^(.*)$/",
-        $methods = ["get"], 
+        $url = "/.*/",
+        $methods = true, 
         $id = null,
-        $tags = [],
+        $tags = []
     )
     {
         $route = [
-            "methods" => $methods,
+            "methods" => is_array($methods) ? array_map("strtolower", $methods) : true,
             "url" => $url,
+            "is_regex" => strlen($url) > 1 && substr($url, 0, 1) == "/" && substr($url, -1) == "/",
             "callback" => $callback,
             "tags" => $tags,
         ];
@@ -47,9 +52,11 @@ class Router
     {
         foreach($this->routes as $route)
         {
+            if(is_array($route["methods"]) && !in_array(strtolower($_SERVER["REQUEST_METHOD"]), $route["methods"])) continue;
+
             if(
                 // For regex URL
-                (strlen($route["url"]) > 1 && substr($route["url"], 0, 1) == "/" && substr($route["url"], -1) == "/") && preg_match($route["url"], $this->url, $this->matches) ||
+                ($route["is_regex"] && preg_match($route["url"], $this->url, $this->matches)) ||
                 // For non-regex URL
                 $this->url == $route["url"]
             ) 
@@ -60,6 +67,7 @@ class Router
                 {
                     $result["callback"]();
                 }
+
                 break;
             }
         }
@@ -68,25 +76,16 @@ class Router
         {
             if(isset($this->callback_404) && is_callable($this->callback_404))
             {
+                http_response_code(404);
                 call_user_func($this->callback_404);
             }
         }
-
-    }
-    
-    /**
-     * Return the relative path to the base/root directory
-     * @return string the relative path to the base/root directory
-     */
-    function base()
-    {
-        $result = str_repeat("../", substr_count($this->url, "/")+1);
-        return $result == "" ? "./" : $result;
     }
 
     function id($id)
     {
-
+        if(array_key_exists($id, $this->routes) && !$this->routes[$id]["is_regex"]) 
+            return $this->routes[$id]["url"];
     }
 }
 ?>

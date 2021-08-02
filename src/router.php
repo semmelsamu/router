@@ -134,44 +134,51 @@ class Router
 
     private function beautify_url($flags)
     {
+        $redirect = false;
+
         $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
+        $host = $_SERVER["HTTP_HOST"];
+        $uri = $_SERVER["REQUEST_URI"];
 
-        $location = $protocol . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
-        $new_location = $location;
-
-        
         if($flags & HTTPS)
         {
-            $protocol = "https://";
-            $new_location = $protocol . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+            if($protocol == "http://")
+            {
+                $redirect = true;
+                $protocol = "https://";
+            }
         }
 
         if($flags & NO_WWW)
         {
-            if(substr($_SERVER['HTTP_HOST'], 0, 4) == "www.")
+            if(substr($host, 0, 4) == "www.")
             {
-                $new_location = $protocol . substr($_SERVER['HTTP_HOST'], 4) . $_SERVER['REQUEST_URI'];
+                $redirect = true;
+                $host = substr($host, 4);
             }
         }
 
         if($flags & NO_TRAILING_SLASHES)
         {
-            if(substr($new_location, -1) == "/")
+            // Trailing slashes can't be removed from directories or the website root
+            if(!is_dir($_SERVER["DOCUMENT_ROOT"].$uri) && $uri != "/")
             {
-                $new_location = substr($new_location, 0, -1);
+                if(substr($uri, -1) == "/")
+                {
+                    $redirect = true;
+                    $uri = substr($uri, 0, -1);
+                }
             }
         }
 
-        db($location);
-        db($new_location,1);
-
-
-        // URL changed, redirect
-        if($new_location != $location)
+        if($redirect)
         {
+            $location = $protocol . $host . $uri;
+
             header("Link: <$location>; rel=\"canonical\"");
             header("HTTP/1.1 301 Moved Permanently");
             header("Location: $location");
+            
             exit;
         }
     }

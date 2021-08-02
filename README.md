@@ -1,4 +1,4 @@
-# Router
+# router
 
 > Small PHP router with route linking and file redirects
 

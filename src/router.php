@@ -2,16 +2,6 @@
 
 namespace semmelsamu;
 
-define("HTTPS", 0x1);
-define("NO_WWW", 0x2);
-define("NO_TRAILING_SLASHES", 0x4);
-
-include("route.php");
-
-/**
- * Router
- * @author semmelsamu
- */
 class Router
 {
     function __construct()
@@ -22,18 +12,34 @@ class Router
         $this->route_403 = null;
     }
 
-    /**
-     * Add one or multiple Routes to the Router
-     * @param array $routes the Route(s) to add
-     * @return null
-     */
-    function add($routes) 
+    function add(
+        $url,
+        $callback,
+        $methods = ["get"], 
+        $id = null,
+        $tags = [],
+    )
     {
-        foreach($routes as $route)
+        $route = [
+            "methods" => $methods,
+            "url" => $url,
+            "callback" => $callback,
+            "tags" => $tags,
+        ];
+
+        if(isset($id))
         {
-            if(is_a($route, '\semmelsamu\Route'))
-                array_push($this->routes, $route);
+            $this->routes[$id] = $route;
         }
+        else
+        {
+            array_push($this->routes, $route);
+        }
+    }
+
+    function add_404($callback)
+    {
+        $this->callback_404 = $callback;
     }
 
     // Main Route
@@ -43,61 +49,35 @@ class Router
      */
     function route()
     {
-        $this->result = $this->route_inner($id);
-
-        if(!isset($this->result))
-            $this->result = $this->route_403;
-
-        return $this->result;
-    }
-
-    private function route_inner($id = null)
-    {
-        $result = null;
-
-        // Loop through all routes and check if the url corresponds to any
         foreach($this->routes as $route)
         {
-            if($route->route($this->url) || (isset($id) && $route->id == $id))
+            if(
+                (   // For regex URL
+                    strlen($route["url"]) > 1 && substr($route["url"], 0, 1) == "/" && substr($route["url"], -1) == "/") && 
+                    preg_match($route["url"], $this->url, $this->matches
+                ) ||
+                // For non-regex URL
+                $this->url == $route["url"]
+            ) 
             {
                 $result = $route;
+
+                if(is_callable($result["callback"]))
+                {
+                    $result["callback"]();
+                }
                 break;
             }
         }
 
-        // Check for goto
-        if(isset($result) && $result->goto)
-        {
-            $result = $this->route($result->goto);
-        }
-
         if(!isset($result))
         {
-            if(is_file($this->url))
+            if(isset($this->callback_404) && is_callable($this->callback_404))
             {
-                $result = new Route($this->url, $this->url);
+                call_user_func($this->callback_404);
             }
         }
 
-        return $result;
-    }
-
-    /**
-     * Route (if not yet done) and output the routed file
-     */
-    function output()
-    {
-        if(!isset($this->result))
-            $this->route();
-
-        if(substr($this->result->file, -4) == ".php")
-        {
-            include($this->htdocs_folder.$this->result->file);
-        }
-        else
-        {
-            $this->output_file($this->result->file);
-        }
     }
 
     // URL managing functions

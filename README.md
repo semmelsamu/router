@@ -1,6 +1,6 @@
 # router
 
-> Small PHP router with route linking and file redirects
+> Small PHP router with route linking
 
 ## Requirements
 
@@ -17,6 +17,8 @@ Redirect all requests to one PHP file (`index.php`). A possible solution with th
 
 ```htaccess
 RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f
 RewriteRule . index.php [QSA,L]
 ```
 
@@ -29,81 +31,79 @@ Use the namespace `semmelsamu`:
 
 ```php
 use \semmelsamu\Router;
-use \semmelsamu\Route;
 ```
 
 ## Router
 
 ```php
-new Router([$htdocs_folder, $error_document]) : void
+new Router() : void
 ```
 
 Create a new instance of the router.
 
-#### Parameters
-
-- `$htdocs_folder`
-    - The folder where all your htdocs are.
-    - Type: `string`
-    - Default: `htdocs/`
-- `$error_document`
-    - The path to the 404 document
-    - Type: `string`
-    - Default: `404.php`
-
 ### add
 
 ```php
-Router::add($routes) : void
+Router::add(
+    $callback, 
+    $url = "/.*/", 
+    $methods = true,  
+    $id = null, 
+    $tags = null
+) : void
 ```
 
-Add one or multiple [Routes](#routeclass) to the Router.
+Add a Route to the Router.
 
 #### Parameters
 
-- `$routes`
-    - The route(s).
-    - Type: `Array`
+- `$callback`
+    - The callback function.
+    - Type: `function`
+- `$url`
+    - The url the Route should match.
+    - Type: `string|regex`
+    - Default: `/.*/`
+- `$methods`
+    - The accepted request methods. If set to `true`, all request methods will be accepted.
+    - Type: `bool|array`
+    - Default: `true`
+- `$id`
+    - The unique id of the Route.
+    - Type: `int`
+    - Default: `null`
+- `$tags`
+    - The tags of the Route.
+    - Type: `array`
+    - Default: `[]`
+
+### add_404
+
+```php
+Router::add_404($callback) : void
+```
+
+Add the 404 callback to the Router.
+
+#### Parameters
+
+- `$callback`
+    - The callback function.
+    - Type: `function`
 
 ### route
 
 ```php
-Router::route([$id]) : Route
+Router::route() : void
 ```
 
-Set the current route.
-
-#### Parameters
-
-- `$id`
-    - If specified, set the route with the id `$id`.
-    - Type: `int|string`
-
-#### Return values
-
-Returns the current route.
-
-### output
-
-```php
-Router::output() : void
-```
-
-Output the current route.
+Call the current callback.
 
 ### url
 
 ```php
-Router::url([$trailing_slashes]) : string
+Router::url : string
 ```
-
-Return the relative URL from the router root directory, without the PHP parameters
-
-#### Parameters
-
-- `$trailing_slashes`
-    - States if trailing slashes are allowed.
-    - Type: `bool`
 
 #### Return values
 
@@ -112,10 +112,8 @@ Returns the relative URL from the router root directory, without the PHP paramet
 ### base
 
 ```php
-Router::base() : string
+Router::base : string
 ```
-
-Return the relative path to the base/root directory
 
 #### Return values
 
@@ -137,33 +135,4 @@ Return the relative path to the route with a specific id
 
 #### Return values
 
-Returns the relative path to the route or `NULL` if the Route's url is a regular expression
-
-
-<a id="routeclass"></a>
-## Route
-
-```php
-new Route([$url, $file, $id, $goto]) : void
-```
-
-Create a new Route.
-
-#### Parameters
-
-- `$url`
-    - The url to the route or a regular expression that matches the url.
-    - Type: `string|regex`
-    - Default: `/^$/`
-- `$file`
-    - The path to the file the route should refer to.
-    - Type: `string`
-    - Default: `index.php`
-- `$id`
-    - The unique id of the route.
-    - Type: `string|int`
-    - Default: `NULL`
-- `$goto`
-    - If not `false`, specifies the id of another Route this Route is an alias for.
-    - Type: `bool|int|string`
-    - Default: `false`
+Returns the relative path to the route. Returns nothing if the Route's url is a regular expression.

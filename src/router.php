@@ -14,42 +14,12 @@ include("route.php");
  */
 class Router
 {
-    public $htdocs_folder, $error_document, $flags;
-    private $routes, $result, $mime_types;
-
-    /**
-     * Class constructor
-     * 
-     * @param string $htdocs_folder the folder where all your htdocs are
-     * @param string $error_document path to the 404 document
-     * @param flags HTTPS, NO_WWW, NO_TRAILING_SLASHES
-     * 
-     * @return null
-     */
-    function __construct(
-        $htdocs_folder = "htdocs/", 
-        $error_document = "404.php",
-        $beautify_url = HTTPS | NO_WWW | NO_TRAILING_SLASHES
-    )
+    function __construct()
     {
-        // Import all parameters
-        foreach(get_defined_vars() as $key => $val)
-            $this->$key = $val;
+        $this->url = $this->url();
 
-        if($beautify_url !== false)
-        {
-            $this->beautify_url($beautify_url);
-        }
-        
         $this->routes = [];
-    }
-
-    // Getter & Setter
-
-    public function __get($property) {
-        if (property_exists($this, $property)) {
-          return $this->$property;
-        }
+        $this->route_403 = null;
     }
 
     /**
@@ -71,12 +41,12 @@ class Router
     /**
      * Main routing function
      */
-    function route($id = null)
+    function route()
     {
         $this->result = $this->route_inner($id);
 
         if(!isset($this->result))
-            $this->result = new Route(null, $this->error_document);
+            $this->result = $this->route_403;
 
         return $this->result;
     }
@@ -88,7 +58,7 @@ class Router
         // Loop through all routes and check if the url corresponds to any
         foreach($this->routes as $route)
         {
-            if($route->route($this->url()) || (isset($id) && $route->id == $id))
+            if($route->route($this->url) || (isset($id) && $route->id == $id))
             {
                 $result = $route;
                 break;
@@ -103,9 +73,9 @@ class Router
 
         if(!isset($result))
         {
-            if(is_file($this->url()))
+            if(is_file($this->url))
             {
-                $result = new Route($this->url(), $this->url());
+                $result = new Route($this->url, $this->url);
             }
         }
 
@@ -132,62 +102,7 @@ class Router
 
     // URL managing functions
 
-    private function beautify_url($flags)
-    {
-        $redirect = false;
-
-        $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
-        $host = $_SERVER["HTTP_HOST"];
-        $uri = $_SERVER["REQUEST_URI"];
-
-        if($flags & HTTPS)
-        {
-            if($protocol == "http://")
-            {
-                $redirect = true;
-                $protocol = "https://";
-            }
-        }
-
-        if($flags & NO_WWW)
-        {
-            if(substr($host, 0, 4) == "www.")
-            {
-                $redirect = true;
-                $host = substr($host, 4);
-            }
-        }
-
-        if($flags & NO_TRAILING_SLASHES)
-        {
-            // Trailing slashes can't be removed from directories or the website root
-            if(!is_dir($_SERVER["DOCUMENT_ROOT"].$uri) && $uri != "/")
-            {
-                if(substr($uri, -1) == "/")
-                {
-                    $redirect = true;
-                    $uri = substr($uri, 0, -1);
-                }
-            }
-        }
-
-        if($redirect)
-        {
-            $location = $protocol . $host . $uri;
-
-            header("Link: <$location>; rel=\"canonical\"");
-            header("HTTP/1.1 301 Moved Permanently");
-            header("Location: $location");
-            
-            exit;
-        }
-    }
-
-    /**
-     * Return the relative URL from the router root directory, without the PHP parameters
-     * @return string the relative URL from the router root directory, without the PHP parameters
-     */
-    function url($trailing_slashes = false)
+    private function url()
     {
         // Getting the Relative path from the root directory
         $url = substr(urldecode($_SERVER["REQUEST_URI"]), strrpos($_SERVER['PHP_SELF'], "/")+1);
@@ -196,7 +111,7 @@ class Router
         $url = strpos($url, "?") ? substr($url, 0, strpos($url, "?")) : $url;
 
         // No trailing slashes
-        if(substr($url, -1) == "/" && !$trailing_slashes)
+        if(substr($url, -1) == "/")
             $url = substr($url, 0, -1);
 
         return $url;
@@ -208,7 +123,7 @@ class Router
      */
     function base()
     {
-        $result = str_repeat("../", substr_count($this->url(true), "/"));
+        $result = str_repeat("../", substr_count($this->url, "/")+1);
         return $result == "" ? "./" : $result;
     }
 

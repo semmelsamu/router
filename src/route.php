@@ -19,8 +19,8 @@ class Route
      * @return null
      */
     function __construct(
-        $url = "",
-        $file = "index.php",
+        $url,
+        $callback,
         $id = null,
         $goto = false,
         $tags = []

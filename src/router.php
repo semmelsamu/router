@@ -18,8 +18,8 @@ class Router
     }
 
     function add(
-        $callback,
-        $url = "/.*/",
+        $url = "",
+        $callback = null,
         $methods = true, 
         $id = null,
         $tags = []
@@ -28,9 +28,9 @@ class Router
         $route = [
             "methods" => is_array($methods) ? array_map("strtolower", $methods) : true,
             "url" => $url,
-            "is_regex" => strlen($url) > 1 && substr($url, 0, 1) == "/" && substr($url, -1) == "/",
+            "is_regex" => preg_match("/^\/.+\/[a-z]*$/i", $url),
             "callback" => $callback,
-            "tags" => $tags,
+            "tags" => $tags
         ];
 
         if(isset($id))
@@ -51,8 +51,7 @@ class Router
     function call_404()
     {
         http_response_code(404);
-        if(is_callable($this->callback_404))
-            call_user_func($this->callback_404);
+        $this->call($this->callback_404);
     }
 
     function route()
@@ -68,23 +67,27 @@ class Router
                 $this->url == $route["url"]
             ) 
             {
-                $result = $route;
-
-                if(is_callable($result["callback"]))
+                if($this->call($route["callback"]) === false)
                 {
-                    $result["callback"]();
+                    $this->call_404();
                 }
-
                 break;
             }
         }
+    }
 
-        if(!isset($result))
+    function call($callback)
+    {
+        if(is_callable($callback))
         {
-            if(isset($this->callback_404) && is_callable($this->callback_404))
-            {
-                $this->call_404();
-            }
+            call_user_func($callback);
+        }
+        else if(file_exists($callback))
+        {
+            if(substr($callback, -4) == ".php")
+                include($callback);
+            else
+                $this->output_file($callback);
         }
     }
 
@@ -92,5 +95,21 @@ class Router
     {
         if(array_key_exists($id, $this->routes) && !$this->routes[$id]["is_regex"]) 
             return $this->routes[$id]["url"];
+    }
+
+    function output_file($file) 
+    {
+        if(!file_exists($file)) return;
+
+        // Return mime type ala mimetype extension
+        switch (substr($file, strrpos($file, ".")+1)) {
+            case "css": $mime_type = "text/css"; break;
+            case "js": $mime_type = "text/javascript"; break;
+            default: $mime_type = mime_content_type($file); break;
+        }
+
+        header("Content-Type: ".$mime_type);
+        readfile($file);
+        exit;
     }
 }

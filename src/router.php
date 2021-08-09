@@ -8,7 +8,9 @@ class Router
     {
         $this->url = trim(substr(urldecode(parse_url($_SERVER["REQUEST_URI"])["path"]), strlen(dirname($_SERVER["PHP_SELF"]))), "/");
 
-        $this->base = str_repeat("../", substr_count(substr($_SERVER["REQUEST_URI"], strlen(dirname($_SERVER["PHP_SELF"]))), "/")-1);
+        $times = substr_count(substr($_SERVER["REQUEST_URI"], strlen(dirname($_SERVER["PHP_SELF"]))), "/")-1;
+        $times = $times > 0 ? $times : 0;
+        $this->base = str_repeat("../", $times);
         $this->base = $this->base == "" ? "./" : $this->base;
         
         $this->matches = [];

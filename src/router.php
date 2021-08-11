@@ -153,7 +153,7 @@ class Router
 
     function id($id)
     {
-        if(array_key_exists($id, $this->routes) && !$this->routes[$id]["is_regex"]) 
+        if(array_key_exists($id, $this->routes) && !preg_match("/^\/.+\/$/", $this->routes[$id]["url"]))
             return $this->routes[$id]["url"];
     }
 

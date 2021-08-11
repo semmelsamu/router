@@ -58,7 +58,7 @@ Add a Route to the Router.
 #### Parameters
 
 - `$callback`
-    - The callback function.
+    - The callback function. Can also be a file which will be included if it is a PHP file or just be sent to the browser.
     - Type: `function`
 - `$url`
     - The url the Route should match.
@@ -88,7 +88,7 @@ Add the 404 callback to the Router.
 #### Parameters
 
 - `$callback`
-    - The callback function.
+    - The callback function. Can also be a file which will be included if it is a PHP file or just be sent to the browser.
     - Type: `function`
 
 ### route

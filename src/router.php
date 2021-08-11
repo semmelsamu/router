@@ -62,7 +62,7 @@ class Router
             $error = false;
             $this->matches = [];
 
-            if(preg_match("/^\/.+\/$/", $route["url"]))
+            if(preg_match("/^\/.+\/[a-z]*$/i", $route["url"]))
             {
                 if(!preg_match($route["url"], $this->url, $this->matches))
                     $error = true;
@@ -153,7 +153,7 @@ class Router
 
     function id($id)
     {
-        if(array_key_exists($id, $this->routes) && !preg_match("/^\/.+\/$/", $this->routes[$id]["url"]))
+        if(array_key_exists($id, $this->routes) && !preg_match("/^\/.+\/[a-z]*$/i", $this->routes[$id]["url"]))
             return $this->routes[$id]["url"];
     }
 

@@ -14,9 +14,8 @@ class Router
         $this->base = $this->base == "" ? "./" : $this->base;
         
         $this->matches = [];
-
         $this->routes = [];
-        $this->route_403 = null;
+        $this->callback_404 = null;
     }
 
     function add(
@@ -30,19 +29,15 @@ class Router
         $route = [
             "methods" => is_array($methods) ? array_map("strtolower", $methods) : true,
             "url" => $url,
-            "is_regex" => preg_match("/^\/.+\/[a-z]*$/i", $url),
             "callback" => $callback,
             "tags" => $tags
         ];
 
         if(isset($id))
-        {
             $this->routes[$id] = $route;
-        }
+
         else
-        {
             array_push($this->routes, $route);
-        }
     }
 
     function add_404($callback)
@@ -60,21 +55,84 @@ class Router
     {
         foreach($this->routes as $route)
         {
-            if(is_array($route["methods"]) && !in_array(strtolower($_SERVER["REQUEST_METHOD"]), $route["methods"])) continue;
 
-            if(
-                // For regex URL
-                ($route["is_regex"] && preg_match($route["url"], $this->url, $this->matches)) ||
-                // For non-regex URL
-                $this->url == $route["url"]
-            ) 
+            if(is_array($route["methods"]) && !in_array(strtolower($_SERVER["REQUEST_METHOD"]), $route["methods"])) 
+                continue;
+
+            $error = false;
+            $this->matches = [];
+
+            if(preg_match("/^\/.+\/$/", $route["url"]))
             {
-                if($this->call($route["callback"]) === false)
+                if(!preg_match($route["url"], $this->url, $this->matches))
+                    $error = true;
+            }
+            else
+            {
+                $url_parts = explode("/", $this->url);
+                $route_parts = explode("/", $route["url"]);
+
+                if(sizeof($url_parts) > sizeof($route_parts))
                 {
-                    $this->call_404();
+                    $error = true;
                 }
+                else
+                {
+                    $last_required_route_part = 0;
+
+                    foreach($route_parts as $i => $part)
+                    {
+                        if(!preg_match("/^<(.+)>$/", $part))
+                        {
+                            $last_required_route_part = $i;
+                        }
+                    }
+
+                    foreach($route_parts as $i => $part)
+                    {
+                        if(preg_match("/^<(.+)>$/", $part, $match_name))
+                        {
+                            if(isset($url_parts[$i]))
+                                $this->matches[$match_name[1]] = $url_parts[$i];
+                            
+                            else
+                            {
+                                if($i > $last_required_route_part)
+                                    $this->matches[$match_name[1]] = "";
+
+                                else
+                                {
+                                    $error = true;
+                                    break;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            if(isset($url_parts[$i]) && $part == $url_parts[$i])
+                                continue;
+
+                            else
+                            {
+                                $error = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+
+            if(!$error)
+            {
+                $this->call($route["callback"]);
                 break;
             }
+        }
+
+        if(isset($error) && $error)
+        {
+            $this->matches = [];
+            $this->call_404();
         }
     }
 

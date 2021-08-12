@@ -154,7 +154,21 @@ class Router
     function id($id)
     {
         if(array_key_exists($id, $this->routes) && !preg_match("/^\/.+\/[a-z]*$/i", $this->routes[$id]["url"]))
-            return $this->routes[$id]["url"];
+        {
+            $url = "";
+
+            foreach(explode("/", $this->routes[$id]["url"]) as $part)
+            {
+                if(!preg_match("/^<(.+)>$/", $part))
+                {
+                    $url .= $part;
+                }
+                else
+                    break;
+            }
+
+            return $url;
+        }
     }
 
     function output_file($file) 

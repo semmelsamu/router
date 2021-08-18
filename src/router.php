@@ -8,10 +8,24 @@ class Router
     {
         $this->url = trim(substr(urldecode(parse_url($_SERVER["REQUEST_URI"])["path"]), strlen(dirname($_SERVER["PHP_SELF"]))), "/");
 
-        $times = substr_count(substr($_SERVER["REQUEST_URI"], strlen(dirname($_SERVER["PHP_SELF"]))), "/")-1;
-        $times = $times > 0 ? $times : 0;
-        $this->base = str_repeat("../", $times);
-        $this->base = $this->base == "" ? "./" : $this->base;
+        
+        // Calculate base
+
+        $url_without_base = substr($_SERVER["REQUEST_URI"], strlen(dirname($_SERVER["PHP_SELF"])));
+        $url_has_trailing_slash = substr($_SERVER["REQUEST_URI"], strrpos($_SERVER["REQUEST_URI"], "?")-1, 1) == "/";
+
+        $times = sizeof(array_filter(explode("/", $url_without_base)))-1;
+
+        if($url_has_trailing_slash)
+            $times++;
+
+        if($times < 1)
+            $this->base = "./";
+        else
+            $this->base = str_repeat("../", $times);
+
+
+        // Initialize Variables
         
         $this->matches = [];
         $this->routes = [];

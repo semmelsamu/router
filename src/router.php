@@ -152,16 +152,19 @@ class Router
 
     function call($callback)
     {
-        if(is_callable($callback))
+        if(!empty($callback))
         {
-            call_user_func($callback);
-        }
-        else if(file_exists($callback))
-        {
-            if(substr($callback, -4) == ".php")
-                include($callback);
-            else
-                $this->output_file($callback);
+            if(is_callable($callback))
+            {
+                call_user_func($callback);
+            }
+            else if(file_exists($callback))
+            {
+                if(substr($callback, -4) == ".php")
+                    include($callback);
+                else
+                    $this->output_file($callback);
+            }
         }
     }
 

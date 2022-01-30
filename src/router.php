@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace semmelsamu;
 
 class Router
@@ -33,12 +35,12 @@ class Router
     }
 
     function add(
-        $url = "",
-        $callback = null,
-        $methods = true, 
-        $id = null,
-        $tags = []
-    )
+        string $url = "",
+        string|callable $callback = null,
+        bool|array $methods = true, 
+        int $id = null,
+        array $tags = []
+    ): void
     {
         $route = [
             "methods" => is_array($methods) ? array_map("strtolower", $methods) : true,
@@ -54,7 +56,7 @@ class Router
             array_push($this->routes, $route);
     }
 
-    function add_404($callback)
+    function add_404(string|callable $callback): void
     {
         $this->callback_404 = $callback;
     }
@@ -65,7 +67,7 @@ class Router
         $this->call($this->callback_404);
     }
 
-    function route()
+    function route(): void
     {
         foreach($this->routes as $route)
         {
@@ -150,13 +152,13 @@ class Router
         }
     }
 
-    function call($callback)
+    function call(string|callable|null $callback)
     {
         if(!empty($callback))
         {
             if(is_callable($callback))
             {
-                call_user_func($callback);
+                call_user_func($callback, $this->matches);
             }
             else if(file_exists($callback))
             {
@@ -168,7 +170,7 @@ class Router
         }
     }
 
-    function id($id)
+    function id(int $id): string
     {
         if(array_key_exists($id, $this->routes) && !preg_match("/^\/.+\/[a-z]*$/i", $this->routes[$id]["url"]))
         {
@@ -188,7 +190,7 @@ class Router
         }
     }
 
-    function output_file($file) 
+    function output_file(string $file) 
     {
         if(!file_exists($file)) return;
 

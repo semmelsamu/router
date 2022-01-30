@@ -9,7 +9,7 @@
 
 ## Installation
 
-Copy the repository to a static location on your webserver.
+Copy `src/router.php` to a static location on your webserver.
 
 ## Setup
 
@@ -27,7 +27,7 @@ In this case, we redirect all traffic to `index.php`.
 In the redirected PHP file, include the router:
 
 ```php
-include("src/router.php");
+include("router.php");
 ```
 Use the namespace `semmelsamu`:
 
@@ -47,12 +47,12 @@ Create a new instance of the router.
 
 ```php
 Router::add(
-    $url = "", 
-    $callback,
-    $methods = true,  
-    $id = null, 
-    $tags = null
-) : void
+    string $url = "",
+    string|callable $callback = null,
+    bool|array $methods = true, 
+    int $id = null,
+    array $tags = []
+): void
 ```
 
 Add a Route to the Router.
@@ -64,12 +64,15 @@ Add a Route to the Router.
     - Type: `string` or `regex`
     - Default: `""`
 - `$callback`
-    - The callback function or a file. If the file is a PHP file, it will be included. Else, it will just be sent to the browser as normal.
+    - The callback function or a path to a file. If the file is a PHP file, it will be included. Else, it will just be sent to the browser as normal.
     - Type: `function` or `string`
 - `$methods`
-    - The accepted request methods. If set to `true`, all request methods will be accepted.
+    - The accepted request methods, specified in an array. If set to `true`, all request methods will be accepted.
     - Type: `bool` or `array`
     - Default: `true`
+
+The following parameters are not essential, rather to help you organize and find your routes:
+
 - `$id`
     - The unique id of the Route.
     - Type: `int`
@@ -82,7 +85,7 @@ Add a Route to the Router.
 ### add_404
 
 ```php
-Router::add_404($callback) : void
+Router::add_404(string|callable $callback): void
 ```
 
 Add the 404 callback to the Router.
@@ -90,13 +93,13 @@ Add the 404 callback to the Router.
 #### Parameters
 
 - `$callback`
-    - The callback function or a file. If the file is a PHP file, it will be included. Else, it will just be sent to the browser as normal.
+    - The callback function or a path to a file. If the file is a PHP file, it will be included. Else, it will just be sent to the browser as normal.
     - Type: `function` or `string`
 
 ### route
 
 ```php
-Router::route() : void
+Router::route(): void
 ```
 
 Call the current callback.
@@ -104,7 +107,7 @@ Call the current callback.
 ### url
 
 ```php
-Router::url : string
+Router::url: string
 ```
 
 #### Return values
@@ -114,7 +117,7 @@ Returns the relative URL from the router root directory, without the PHP paramet
 ### base
 
 ```php
-Router::base : string
+Router::base: string
 ```
 
 #### Return values
@@ -124,7 +127,7 @@ Returns the relative path to the base/root directory
 ### id
 
 ```php
-Router::id($id) : string
+Router::id(id $id): string
 ```
 
 Return the relative path to the route with a specific id
@@ -133,7 +136,7 @@ Return the relative path to the route with a specific id
 
 - `$id`
     - The id of the route.
-    - Type: `bool`
+    - Type: `int`
 
 #### Return values
 
@@ -173,14 +176,16 @@ echo '<a href="'.$link_to_contacts.'">To the contact page</a>';
 
 
 // Add a Route with Parameters in the URL
-$router->add("video/<id>/comments/<comment>", function() { 
-    
-    // Get the Parameters
-    global $router;
-    echo "Video ID: " . $router->matches["id"]; 
-    echo "Comment: " . $router->matches["comment"]; 
+$router->add("video/<id>/comments/<comment>", function($params) {
+    echo "Video ID: " . $params["id"]; 
+    echo "Comment: " . $params["comment"]; 
 });
 
 
-// Of course you can mix and match all the options above as you like and need! 
+// Add the 404 route if no matching route was found
+$router->add_404(function() { echo "Error 404"; });
+
+
+// Call the current callback
+$router->route()
 ```

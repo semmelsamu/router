@@ -99,10 +99,10 @@ Add the 404 callback to the Router.
 ### route
 
 ```php
-Router::route(): void
+Router::route(): string
 ```
 
-Call the current callback.
+Call the current callback and get its returned contents.
 
 ### url
 

@@ -64,10 +64,10 @@ class Router
     function call_404()
     {
         http_response_code(404);
-        $this->call($this->callback_404);
+        return $this->call($this->callback_404);
     }
 
-    function route(): void
+    function route(): string
     {
         foreach($this->routes as $route)
         {
@@ -140,20 +140,21 @@ class Router
 
             if(!$error)
             {
-                $this->call($route["callback"]);
-                break;
+                return $this->call($route["callback"]);
             }
         }
 
         if(isset($error) && $error)
         {
             $this->matches = [];
-            $this->call_404();
+            return $this->call_404();
         }
     }
 
-    function call(string|callable|null $callback)
+    function call(string|callable|null $callback): string
     {
+        ob_start();
+
         if(!empty($callback))
         {
             if(is_callable($callback))
@@ -168,6 +169,8 @@ class Router
                     $this->output_file($callback);
             }
         }
+
+        return ob_get_clean();
     }
 
     function id(int $id): string

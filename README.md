@@ -153,7 +153,7 @@ $router = new Router();
 
 
 // Add a simple Route
-$router->add("/", function() { echo "Hello!"; });
+$router->add("", function() { echo "Hello!"; });
 
 
 // Add a Route with a file instead of a callback function

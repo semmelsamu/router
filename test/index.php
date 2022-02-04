@@ -3,5 +3,5 @@
 include("../src/router.php");
 
 $router = new \semmelsamu\Router();
-
-var_dump($router->base);
+$router->add("", function() { echo "Hello!"; });
+echo $router->route();

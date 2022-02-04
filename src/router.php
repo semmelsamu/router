@@ -144,11 +144,9 @@ class Router
             }
         }
 
-        if(isset($error) && $error)
-        {
-            $this->matches = [];
-            return $this->call_404();
-        }
+        $this->matches = [];
+        return $this->call_404();
+        
     }
 
     function call(string|callable|null $callback): string

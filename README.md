@@ -187,5 +187,5 @@ $router->add_404(function() { echo "Error 404"; });
 
 
 // Call the current callback
-echo $router->route()
+echo $router->route();
 ```

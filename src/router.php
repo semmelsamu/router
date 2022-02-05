@@ -61,7 +61,7 @@ class Router
         $this->callback_404 = $callback;
     }
 
-    function call_404()
+    function call_404(): string
     {
         http_response_code(404);
         return $this->call($this->callback_404);
@@ -181,7 +181,7 @@ class Router
             {
                 if(!preg_match("/^<(.+)>$/", $part))
                 {
-                    $url .= $part;
+                    $url .= $part."/";
                 }
                 else
                     break;
@@ -196,11 +196,11 @@ class Router
         if(!file_exists($file)) return;
 
         // Return mime type ala mimetype extension
-        switch (substr($file, strrpos($file, ".")+1)) {
-            case "css": $mime_type = "text/css"; break;
-            case "js": $mime_type = "text/javascript"; break;
-            default: $mime_type = mime_content_type($file); break;
-        }
+        $mime_type = match(substr($file, strrpos($file, ".")+1)) {
+            "css" => "text/css",
+            "js" => "text/javascript",
+            default => mime_content_type($file)
+        };
 
         header("Content-Type: ".$mime_type);
         readfile($file);

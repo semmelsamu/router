@@ -27,7 +27,7 @@ In this case, we redirect all traffic to `index.php`.
 In the redirected PHP file, include the router:
 
 ```php
-include("router.php");
+include("Router.php");
 ```
 Use the namespace `semmelsamu`:
 
@@ -146,7 +146,7 @@ Returns the relative path to the route. Returns nothing if the Route's url is a 
 
 ```php
 // Set up the router
-include("src/router.php");
+include("src/Router.php");
 use \semmelsamu\Router;
 
 $router = new Router();

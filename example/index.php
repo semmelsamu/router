@@ -1,7 +1,7 @@
 <?php
 
 // Set up the router
-include("../src/router.php");
+include("../src/Router.php");
 use \semmelsamu\Router;
 
 $router = new Router();

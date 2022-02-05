@@ -1,0 +1,7 @@
+{
+    "name": "semmelsamu/router",
+    "description": "Small PHP router with route linking",
+    "require": {
+        "php": ">=8.0.0"
+    }
+}

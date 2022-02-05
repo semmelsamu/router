@@ -159,7 +159,7 @@ $router->add("", function() { echo "Hello!"; });
 // Add a Route with a file instead of a callback function
 $router->add("image", "image.jpg");
 
-// PHP files will be automatically included
+// PHP files will be automatically included and executed
 $router->add("about", "about.php"); 
 
 

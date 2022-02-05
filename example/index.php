@@ -14,7 +14,7 @@ $router->add("", function() { echo "Hello!"; });
 // Add a Route with a file instead of a callback function
 $router->add("image", "image.jpg");
 
-// PHP files will be automatically included
+// PHP files will be automatically included and executed
 $router->add("about", "about.php"); 
 
 
@@ -23,17 +23,15 @@ $router->add(url: "form", callback: "process_form.php", methods:["POST"]);
 
 
 // Add a Route with a unique ID and tags
-$router->add(url: "page/contact", callback: "contact.php", id: 4, tags: ["main", "public"]);
+$router->add(url: "page/contact", callback: function() { echo "Contact page!"; }, id: 4, tags: ["foo", "bar"]);
 
 // The ID can be used later to link to the Route again
 $link_to_contacts = $router->base . $router->id(4); # Should be something like "./page/contact"
-echo '<a href="'.$link_to_contacts.'">To the contact page</a>';
 
 
 // Add a Route with Parameters in the URL
-$router->add("video/<id>/comments/<comment>", function($params) {
-    echo "Video ID: " . $params["id"]; 
-    echo "Comment: " . $params["comment"]; 
+$router->add("video/<id>", function($params) {
+    echo "Video ID: " . $params["id"];
 });
 
 

@@ -5,7 +5,7 @@
 ## Requirements
 
 - PHP >= 8
-- Any webserver which can redirect requests to a specific file (e.g. via .htaccess)
+- Any webserver which can redirect requests to a specific file (e.g. Apache via .htaccess)
 
 ## Installation
 

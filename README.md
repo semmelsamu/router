@@ -38,7 +38,7 @@ use \semmelsamu\Router;
 ## Router
 
 ```php
-new Router() : void
+new Router(): void
 ```
 
 Create a new instance of the router.

@@ -132,6 +132,14 @@ Router::id(id $id): string
 
 Return the relative path to the route with a specific id
 
+### sitemap
+
+```php
+Router::sitemap(): null
+```
+
+Generates and outputs a sitemap in XML format to the user. Every route that doesn't have the tag `hidden` will be included.
+
 #### Parameters
 
 - `$id`

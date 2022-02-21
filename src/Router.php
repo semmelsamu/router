@@ -208,4 +208,42 @@ class Router
         readfile($file);
         exit;
     }
+
+    
+    function sitemap()
+    {
+        // Controller
+
+        $base = (isset($_SERVER["HTTPS"]) ? "https://" : "http://") . $_SERVER['SERVER_NAME'] . "/";
+
+        $routes_to_render = [];
+
+        foreach($this->routes as $route)
+        {
+            if(
+                !preg_match("/^\/.+\/[a-z]*$/i", $route["url"]) && 
+                !in_array("hidden", $route["tags"]) &&
+                !preg_match(('/.*<.*>.*/'), $route["url"])
+            )
+            {
+                array_push($routes_to_render, $base.$route["url"]);
+            }
+        }
+
+        // View
+
+        header('Content-Type: text/xml');
+
+        echo '<?xml version="1.0" encoding="UTF-8"?>';
+
+        echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
+
+        foreach($routes_to_render as $loc):
+            echo "<url><loc>$loc</loc></url>";
+        endforeach;
+
+        echo '</urlset>';
+
+        exit;
+    }
 }

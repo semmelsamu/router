@@ -171,7 +171,7 @@ class Router
         return ob_get_clean();
     }
 
-    function id(int|string $id): string
+    function id(int|string $id): ?string
     {
         if(array_key_exists($id, $this->routes) && !preg_match("/^\/.+\/[a-z]*$/i", $this->routes[$id]["url"]))
         {
@@ -189,6 +189,8 @@ class Router
 
             return $url;
         }
+
+        return null;
     }
 
     function output_file(string $file) 

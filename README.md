@@ -50,7 +50,7 @@ Router::add(
     string $url = "",
     string|callable $callback = null,
     bool|array $methods = true, 
-    int $id = null,
+    int|string $id = null,
     array $tags = []
 ): void
 ```
@@ -75,7 +75,7 @@ The following parameters are not essential, rather to help you organize and find
 
 - `$id`
     - The unique id of the Route.
-    - Type: `int`
+    - Type: `int|string`
     - Default: `null`
 - `$tags`
     - The tags of the Route.
@@ -127,7 +127,7 @@ Returns the relative path to the base/root directory
 ### id
 
 ```php
-Router::id(id $id): string
+Router::id(int|string $id): string
 ```
 
 Return the relative path to the route with a specific id

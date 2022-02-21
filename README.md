@@ -140,16 +140,6 @@ Router::sitemap(): null
 
 Generates and outputs a sitemap in XML format to the user. Every route that doesn't have the tag `hidden` will be included.
 
-#### Parameters
-
-- `$id`
-    - The id of the route.
-    - Type: `int`
-
-#### Return values
-
-Returns the relative path to the route. Returns nothing if the Route's url is a regular expression.
-
 ## Example
 
 ```php

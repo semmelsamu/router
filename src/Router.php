@@ -10,7 +10,7 @@ class Router
     {
         $this->url = trim(substr(urldecode(parse_url($_SERVER["REQUEST_URI"])["path"]), strlen(dirname($_SERVER["PHP_SELF"]))), "/");
 
-        
+
         // Calculate base
 
         $url_without_base = substr($_SERVER["REQUEST_URI"], strlen(dirname($_SERVER["PHP_SELF"])));
@@ -28,7 +28,7 @@ class Router
 
 
         // Initialize Variables
-        
+
         $this->matches = [];
         $this->routes = [];
         $this->callback_404 = null;
@@ -38,7 +38,7 @@ class Router
         string $url = "",
         string|callable $callback = null,
         bool|array $methods = true, 
-        int $id = null,
+        int|string $id = null,
         array $tags = []
     ): void
     {
@@ -110,7 +110,7 @@ class Router
                         {
                             if(isset($url_parts[$i]))
                                 $this->matches[$match_name[1]] = $url_parts[$i];
-                            
+
                             else
                             {
                                 if($i > $last_required_route_part)
@@ -146,7 +146,7 @@ class Router
 
         $this->matches = [];
         return $this->call_404();
-        
+
     }
 
     function call(string|callable|null $callback): string
@@ -171,7 +171,7 @@ class Router
         return ob_get_clean();
     }
 
-    function id(int $id): string
+    function id(int|string $id): string
     {
         if(array_key_exists($id, $this->routes) && !preg_match("/^\/.+\/[a-z]*$/i", $this->routes[$id]["url"]))
         {

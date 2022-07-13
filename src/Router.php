@@ -209,12 +209,12 @@ class Router
         exit;
     }
 
-    
-    function sitemap()
+
+    function sitemap($subdomain = "www.", $trailing_slashes = true)
     {
         // Controller
 
-        $base = (isset($_SERVER["HTTPS"]) ? "https://" : "http://") . $_SERVER['SERVER_NAME'] . "/";
+        $base = (isset($_SERVER["HTTPS"]) ? "https://" : "http://") . $subdomain . $_SERVER['SERVER_NAME'] . "/";
 
         $routes_to_render = [];
 
@@ -226,6 +226,14 @@ class Router
                 !preg_match(('/.*<.*>.*/'), $route["url"])
             )
             {
+                if ($trailing_slashes) {
+                    // Trailing slashes can't be added to files
+                    if (!file_exists($_SERVER["DOCUMENT_ROOT"] . $route["url"])) {
+                        if (substr($route["url"], -1) != "/") {
+                            $route["url"] = $route["url"]."/";
+                        }
+                    }
+                }
                 array_push($routes_to_render, $base.$route["url"]);
             }
         }

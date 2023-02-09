@@ -82,13 +82,13 @@ The following parameters are not essential, rather to help you organize and find
     - Type: `array`
     - Default: `[]`
 
-### add_404
+### set_404
 
 ```php
-Router::add_404(string|callable $callback): void
+Router::set_404(string|callable $callback): void
 ```
 
-Add the 404 callback to the Router.
+Set the 404 callback to the Router.
 
 #### Parameters
 

@@ -6,57 +6,51 @@ namespace semmelsamu;
 
 class Router
 {
+    protected $url = "/";
+    protected $routes = array();
+    
+    protected $base;
+    protected $callback_404;
+    
     function __construct()
     {
-        $this->url = trim(substr(urldecode(parse_url($_SERVER["REQUEST_URI"])["path"]), strlen(dirname($_SERVER["PHP_SELF"]))), "/");
-
-
-        // Calculate base
-
-        $url_without_base = substr($_SERVER["REQUEST_URI"], strlen(dirname($_SERVER["PHP_SELF"])));
-        $url_has_trailing_slash = substr($_SERVER["REQUEST_URI"], strrpos($_SERVER["REQUEST_URI"], "?")-1, 1) == "/";
-
-        $times = sizeof(array_filter(explode("/", $url_without_base)))-1;
-
-        if($url_has_trailing_slash)
-            $times++;
-
-        if($times < 1)
-            $this->base = "./";
-        else
-            $this->base = str_repeat("../", $times);
-
-
-        // Initialize Variables
-
-        $this->matches = [];
-        $this->routes = [];
-        $this->callback_404 = null;
+        $this->url = $_SERVER["REQUEST_URI"];
+        
+        if(substr($this->url, 0, 1) == "/")
+            $this->url = substr($this->url, 1);
+    }
+    
+    function base(): string 
+    {
+        if(!$this->base)
+            $this->base = str_repeat("../", substr_count($url, "/"));
+            
+        return $this->base;
     }
 
     function add(
-        string $url = "",
-        string|callable $callback = null,
-        bool|array $methods = true, 
+        string $url,
+        string|callable $callback,
+        bool|array $methods = true,
         int|string $id = null,
         array $tags = []
     ): void
     {
-        $route = [
+        $route_to_add = array(
             "methods" => is_array($methods) ? array_map("strtolower", $methods) : true,
             "url" => $url,
             "callback" => $callback,
             "tags" => $tags
-        ];
+        );
 
         if(isset($id))
-            $this->routes[$id] = $route;
+            $this->routes[$id] = $route_to_add;
 
         else
-            array_push($this->routes, $route);
+            array_push($this->routes, $route_to_add);
     }
 
-    function add_404(string|callable $callback): void
+    function set_404(string|callable $callback): void
     {
         $this->callback_404 = $callback;
     }
@@ -71,17 +65,18 @@ class Router
     {
         foreach($this->routes as $route)
         {
-
-            if(is_array($route["methods"]) && !in_array(strtolower($_SERVER["REQUEST_METHOD"]), $route["methods"])) 
+            $error = false;
+            
+            if(is_array($route["methods"]) && !in_array(strtolower($_SERVER["REQUEST_METHOD"]), strtolower($route["methods"]))) 
                 continue;
 
-            $error = false;
-            $this->matches = [];
-
-            if(preg_match("/^\/.+\/[a-z]*$/i", $route["url"]))
+            $this->matches = array();
+            
+            # Check if the url of the route is a regular expression (starts and ends with a forward slash "/")
+            if(substr($route["url"], 0, 1) == "/" && substr($route["url"], -1) == "/")
             {
                 if(!preg_match($route["url"], $this->url, $this->matches))
-                    $error = true;
+                    continue;
             }
             else
             {
@@ -146,7 +141,6 @@ class Router
 
         $this->matches = [];
         return $this->call_404();
-
     }
 
     function call(string|callable|null $callback): string

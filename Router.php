@@ -14,7 +14,7 @@ class Router
     
     function __construct()
     {
-        $this->url = $_SERVER["REQUEST_URI"];
+        $this->url = urldecode($_SERVER["REQUEST_URI"]);
         
         if(substr($this->url, 0, 1) == "/")
             $this->url = substr($this->url, 1);
@@ -61,7 +61,7 @@ class Router
         return $this->call($this->callback_404);
     }
 
-    function route(): string
+    function route()
     {
         foreach($this->routes as $route)
         {
@@ -143,7 +143,7 @@ class Router
         return $this->call_404();
     }
 
-    function call(string|callable|null $callback): string
+    function call(string|callable|null $callback)
     {
         ob_start();
 
@@ -151,7 +151,7 @@ class Router
         {
             if(is_callable($callback))
             {
-                call_user_func($callback, $this->matches);
+                return call_user_func($callback, $this->matches);
             }
             else if(file_exists($callback))
             {
@@ -181,7 +181,7 @@ class Router
                     break;
             }
 
-            return $url;
+            return substr($url, 0, -1);
         }
 
         return null;
